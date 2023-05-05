@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="10"
+    android:background="@drawable/fundotela"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingTop="20dp"
+    android:paddingRight="20dp"
+    android:paddingBottom="20dp"
+    tools:context=".tela12_activity">
+
+    <TextView
+        android:id="@+id/txtMensagemT12"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="90dp"
+        android:layout_weight="50"
+
+        android:textColor="@color/black"
+        android:singleLine="false"
+        android:text="Perceba que estes sintomas estão te preparando apenas para lutar ou fugir, mas você sabe que não há perigo nenhum! Seu cérebro está procurando um inimigo que não existe e isso só irá durar de 10 a 15 minutos"
+        android:textAlignment="center"
+        android:textSize="30sp" />
+
+
+    <Button
+        android:id="@+id/passartela13btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="50dp"
+        android:layout_weight="2"
+        android:backgroundTint="#2196F3"
+        android:insetBottom="70dp"
+        android:text="Avançar" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>
+
+
