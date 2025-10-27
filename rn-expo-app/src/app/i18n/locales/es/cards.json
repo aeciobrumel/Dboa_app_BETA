@@ -1,0 +1,29 @@
+{
+  "breath": {
+    "title": "Respiración guiada",
+    "subtitle": "Inhala 4s, mantén 4s, exhala 6s"
+  },
+  "grounding": {
+    "title": "Técnica 5-4-3-2-1",
+    "instructions": "Observa 5 cosas que ves, 4 que tocas, 3 que oyes, 2 que hueles y 1 que saboreas."
+  },
+  "affirmations": {
+    "title": "Afirmaciones",
+    "examples": "Estoy segura(o). Puedo superar esto."
+  },
+  "user": {
+    "listTitle": "Mis Tarjetas",
+    "empty": "Aún no hay tarjetas",
+    "add": "Agregar tarjeta",
+    "addA11y": "Agregar nueva tarjeta",
+    "edit": "Editar tarjeta",
+    "title": "Título",
+    "titlePh": "Ej.: Recuerda respirar...",
+    "body": "Contenido",
+    "bodyPh": "Ej.: \"Esto pasará. Estoy a salvo.\"",
+    "save": "Guardar",
+    "delete": "Eliminar",
+    "listen": "Escuchar tarjeta",
+    "stop": "Detener"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "breath": {
+    "title": "Respiração guiada",
+    "subtitle": "Inspire 4s, segure 4s, expire 6s"
+  },
+  "grounding": {
+    "title": "Técnica 5-4-3-2-1",
+    "instructions": "Observe 5 coisas que vê, 4 que toca, 3 que ouve, 2 que cheira e 1 que saboreia."
+  },
+  "affirmations": {
+    "title": "Afirmações",
+    "examples": "Eu estou segura(o). Eu consigo passar por isso."
+  },
+  "user": {
+    "listTitle": "Meus Cartões",
+    "empty": "Nenhum cartão ainda",
+    "add": "Adicionar cartão",
+    "addA11y": "Adicionar novo cartão",
+    "edit": "Editar cartão",
+    "title": "Título",
+    "titlePh": "Ex.: Lembre-se de respirar...",
+    "body": "Conteúdo",
+    "bodyPh": "Ex.: \"Isso vai passar. Estou segura(o).\"",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "listen": "Ouvir cartão",
+    "stop": "Parar"
+  }
+}

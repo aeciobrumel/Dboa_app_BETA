@@ -1,0 +1,9 @@
+{
+  "title": "Configuración",
+  "language": "Idioma",
+  "bgMusic": "Música de fondo",
+  "narration": "Narración",
+  "haptics": "Vibración al tocar",
+  "telemetry": "Participar anónimamente en métricas (opt-in)"
+}
+

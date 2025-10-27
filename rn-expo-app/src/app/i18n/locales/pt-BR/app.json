@@ -1,0 +1,20 @@
+{
+  "home": {
+    "accessibilityLabel": "Tela inicial",
+    "startNow": "Começar agora",
+    "startNowA11y": "Iniciar protocolo de ajuda"
+  },
+  "a11y": {
+    "startingSession": "Iniciando sessão guiada"
+  },
+  "session": {
+    "endTitle": "Sessão encerrada. Você está no controle."
+  },
+  "common": {
+    "next": "Próximo",
+    "end": "Encerrar",
+    "finish": "Concluir",
+    "goHome": "Voltar ao início"
+  }
+}
+

@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "CopingCards",
+    "slug": "coping-cards",
+    "scheme": "copingcards",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {},
+    "web": { "bundler": "metro" },
+    "extra": {
+      "eas": {
+        "projectId": "00000000-0000-0000-0000-000000000000"
+      }
+    }
+  }
+}
