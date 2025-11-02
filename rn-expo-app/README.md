@@ -123,6 +123,53 @@ Se o terminal listar versões “expected”, use exatamente as sugeridas (ex.: 
 
 OTA (expo-updates) já habilitado por padrão no Expo. Ajuste `app.json` conforme necessário.
 
+## Build e Publicação (Android/iOS)
+
+Pré‑requisitos
+- Conta Expo: `npx eas login`
+- Projeto instala e roda: `npm install` e `npx expo install`
+- iOS (para publicar): conta Apple Developer e Bundle ID
+
+Identificadores (obrigatório para lojas)
+- Edite `app.json` e configure:
+  - Android: `android.package` (ex.: `com.suaempresa.copingcards`)
+  - iOS: `ios.bundleIdentifier` (ex.: `com.suaempresa.copingcards`)
+
+Sincronizar versões com o Expo
+- Sempre que o terminal avisar “expected version…”, rode `npx expo install` ou use as versões sugeridas.
+
+Android
+- APK (instalar direto/teste interno):
+  - `npx eas build -p android --profile preview`
+  - Baixar o último build: `npx eas build:download --latest -p android`
+- AAB (Play Store):
+  - `npx eas build -p android --profile production`
+- Keystore: `npx eas credentials -p android` (faça backup)
+
+iOS
+- IPA (TestFlight/App Store):
+  - `npx eas build -p ios --profile preview` (teste) ou `--profile production` (loja)
+  - Baixar o último build: `npx eas build:download --latest -p ios`
+
+Envio às lojas
+- Play Store: `npx eas submit -p android --latest`
+- App Store: `npx eas submit -p ios --latest`
+
+Scripts prontos (package.json)
+- Android
+  - `npm run build:android:preview` → APK
+  - `npm run build:android` → AAB (loja)
+- iOS
+  - `npm run build:ios:preview` → TestFlight
+  - `npm run build:ios` → App Store
+- Web
+  - `npm run build:web`
+
+Dicas
+- Limpar cache: `npx expo start -c`
+- Listar builds: `npx eas build:list`
+- Rodar sem prompts (CI): adicionar `--non-interactive` aos comandos EAS
+
 ## Identidade visual
 
 - Paleta: #36507D (primária), #A6B3C8, #B4B1C6, #F8DBD8 e superfície #FEF3DD
