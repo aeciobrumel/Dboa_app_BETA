@@ -248,3 +248,14 @@ Todos os arquivos foram comentados em português onde relevante. Dúvidas ou pre
 - Música personalizada do usuário:
   - Em Configurações, toque em "Escolher música de fundo" para selecionar um arquivo de áudio do dispositivo. Para voltar ao padrão, toque em "Usar música padrão".
   - Campo salvo em `useSettingsStore.bgMusicUri`.
+## Ícones do menu inferior (SVG)
+
+- Coloque seus ícones em `assets/svg/` com estes nomes:
+  - `home.svg`, `cards.svg`, `settings.svg`
+- Já configuramos o suporte a SVG com `react-native-svg` e `react-native-svg-transformer`.
+- Arquivos adicionados:
+  - `metro.config.js` (transformer)
+  - `declarations.d.ts` (tipos TypeScript)
+  - Ícones de exemplo (pode substituir à vontade): `assets/svg/{home,cards,settings}.svg`
+- Uso no código: o Tab Navigator importa esses SVGs e renderiza como ícones
+  - Veja `src/app/navigation/RootNavigator.tsx`.

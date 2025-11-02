@@ -1,6 +1,6 @@
 // Home: seletor de idioma (PT/ES) e botão grande "Começar agora"
 import React, { useCallback } from 'react';
-import { View, StyleSheet, StatusBar } from 'react-native';
+import { View, StyleSheet, StatusBar, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import BigButton from '@app/components/BigButton';
@@ -20,10 +20,18 @@ export default function Home() {
   return (
     <View style={styles.container} accessibilityLabel={t('home.accessibilityLabel')}>
       <StatusBar barStyle="dark-content" />
+      <View style={styles.logoWrap}>
+        <Image
+          source={require('../../../assets/svg/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+          accessible
+          accessibilityLabel="Logo"
+        />
+      </View>
       <View style={styles.langRow}>
         <LanguageToggle />
       </View>
-      <View style={styles.spacer} />
       <View style={styles.footer}>
         <BigButton
           label={t('home.startNow')}
@@ -39,10 +47,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: tokens.colors.bg,
-    padding: 24,
-    justifyContent: 'space-between'
+    padding: 24
   },
-  spacer: { flex: 1 },
+  logoWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingVertical: 16 },
+  logo: { width: '80%', maxWidth: 480, height: undefined, aspectRatio: 2.5 },
   langRow: {
     position: 'absolute',
     top: 24,

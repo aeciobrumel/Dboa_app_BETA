@@ -67,7 +67,7 @@ export default function CardsList() {
         renderItem={({ item, drag, isActive }: RenderItemParams<any>) => {
           if (item.type === 'breath') {
             return (
-              <View style={{ opacity: isActive ? 0.9 : 1 }}>
+              <View style={[styles.shadowCard, { opacity: isActive ? 0.9 : 1 }]}>
                 <Pressable
                   accessibilityRole="button"
                   onPress={() => nav.navigate('BreathEditor' as never)}
@@ -94,7 +94,7 @@ export default function CardsList() {
             );
           }
           return (
-            <View style={{ opacity: isActive ? 0.9 : 1 }}>
+            <View style={[styles.shadowCard, { opacity: isActive ? 0.9 : 1 }] }>
               <Pressable
                 accessibilityRole="button"
                 onPress={() => nav.navigate('CardEditor' as never, { id: item.id } as never)}
@@ -147,44 +147,51 @@ export default function CardsList() {
         data={data}
         keyExtractor={(item) => item.id}
         numColumns={2}
-        columnWrapperStyle={{ gap: 12 }}
+        columnWrapperStyle={{ gap: 12, justifyContent: 'space-between' }}
         contentContainerStyle={{ gap: 12, paddingBottom: 24 }}
         renderItem={({ item }) => {
           if (item.type === 'breath') {
             return (
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => nav.navigate('BreathEditor' as never)}
-                style={[styles.tile, { borderColor: tokens.colors.secondary }]}
-              >
-                <Text style={styles.cardTitle} numberOfLines={2}>
-                  {t('breath.title')}
-                </Text>
-                <Text style={styles.cardBody} numberOfLines={2}>
-                  {t('breath.subtitle', 'Inspire 4s, segure 4s, expire 6s')} — {breathCycles} ciclos
-                </Text>
-              </Pressable>
+              <View style={[styles.shadowCard, styles.tileWrapper]}>
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => nav.navigate('BreathEditor' as never)}
+                  style={[styles.tile, { borderColor: tokens.colors.secondary }]}
+                >
+                  <Text style={styles.cardTitle} numberOfLines={2}>
+                    {t('breath.title')}
+                  </Text>
+                  <Text style={styles.cardBody} numberOfLines={2}>
+                    {t('breath.subtitle', 'Inspire 4s, segure 4s, expire 6s')} — {breathCycles} ciclos
+                  </Text>
+                </Pressable>
+              </View>
             );
           }
           return (
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => nav.navigate('CardEditor' as never, { id: item.id } as never)}
-              onLongPress={async () => { await tap(); toggleFavorite(item.id); }}
-              style={[styles.tile, { borderColor: item.favorite ? tokens.colors.primary : tokens.colors.secondary }]}
-            >
-              {(item.imageBase64 || item.imageUri) ? (
-                <Image
-                  source={{ uri: item.imageBase64 ? `data:image/jpeg;base64,${item.imageBase64}` : item.imageUri }}
-                  style={styles.tileImage}
-                  resizeMode="cover"
-                />
-              ) : null}
-              <Text style={styles.cardTitle} numberOfLines={2}>
-                {item.favorite ? '★ ' : ''}
-                {item.title}
-              </Text>
-            </Pressable>
+            <View style={[styles.shadowCard, styles.tileWrapper]}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => nav.navigate('CardEditor' as never, { id: item.id } as never)}
+                onLongPress={async () => { await tap(); toggleFavorite(item.id); }}
+                style={[styles.tile, { borderColor: item.favorite ? tokens.colors.primary : tokens.colors.secondary }]}
+              >
+                {(item.imageBase64 || item.imageUri) ? (
+                  <Image
+                    source={{ uri: item.imageBase64 ? `data:image/jpeg;base64,${item.imageBase64}` : item.imageUri }}
+                    style={styles.tileImage}
+                    resizeMode="cover"
+                  />
+                ) : null}
+                <Text style={styles.cardTitle} numberOfLines={2}>
+                  {item.favorite ? '★ ' : ''}
+                  {item.title}
+                </Text>
+                <Text style={styles.cardBody} numberOfLines={2}>
+                  {item.body}
+                </Text>
+              </Pressable>
+            </View>
           );
         }}
         ListEmptyComponent={<Text style={styles.empty}>{t('user.empty', 'Nenhum cartão ainda')}</Text>}
@@ -206,31 +213,41 @@ const styles = StyleSheet.create({
   topbar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   backBtn: { paddingVertical: 6, paddingHorizontal: 8 },
   backText: { color: tokens.colors.textMuted, fontSize: 14 },
-  title: { color: tokens.colors.text, fontSize: 22, fontWeight: '700', marginBottom: 12, textAlign: 'center' },
+  title: { color: tokens.colors.text, fontSize: 22, marginBottom: 12, textAlign: 'center', fontFamily: 'Lemondrop-Bold' },
   actionsRow: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginBottom: 8 },
   modeBtn: { borderWidth: 1, borderColor: tokens.colors.secondary, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 12 },
   modeBtnActive: { backgroundColor: tokens.colors.secondary },
   modeText: { color: tokens.colors.textMuted },
-  modeTextActive: { color: '#000', fontWeight: '700' },
+  modeTextActive: { color: '#000', fontFamily: 'Lemondrop-Bold' },
   empty: { color: tokens.colors.textMuted, textAlign: 'center', marginTop: 24 },
   card: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderRadius: 14,
     padding: 12,
-    backgroundColor: tokens.colors.surface,
+    backgroundColor: '#FFFFFF',
     overflow: 'hidden'
   },
   tile: {
     flex: 1,
-    minHeight: 160,
-    borderWidth: 2,
+    height: 220,
+    borderWidth: 1,
     borderRadius: 14,
-    padding: 10,
-    backgroundColor: tokens.colors.surface,
-    overflow: 'hidden'
+    padding: 12,
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+    justifyContent: 'space-between'
   },
-  tileImage: { width: '100%', height: 110, borderRadius: 10, marginBottom: 8 },
-  cardTitle: { color: tokens.colors.text, fontSize: 16, fontWeight: '700', marginBottom: 6, textAlign: 'center' },
+  shadowCard: {
+    borderRadius: 14,
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+  tileWrapper: { width: '48%' },
+  tileImage: { width: '100%', height: 110, borderRadius: 10 },
+  cardTitle: { color: tokens.colors.text, fontSize: 16, marginBottom: 6, textAlign: 'center', fontFamily: 'Lemondrop-Bold' },
   cardBody: { color: tokens.colors.textMuted, fontSize: 14, textAlign: 'center' },
   footer: { paddingBottom: 8 },
   handle: { paddingHorizontal: 12, paddingVertical: 8, marginLeft: 8 },

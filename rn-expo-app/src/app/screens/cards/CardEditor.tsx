@@ -169,7 +169,7 @@ export default function CardEditor() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: tokens.colors.bg, padding: 16, gap: 8 },
-  title: { color: tokens.colors.text, fontSize: 22, fontWeight: '700', marginBottom: 8 },
+  title: { color: tokens.colors.text, fontSize: 22, marginBottom: 8, fontFamily: 'Lemondrop-Bold' },
   label: { color: tokens.colors.text, fontSize: 14, marginTop: 8 },
   input: {
     backgroundColor: '#F4F6FA',

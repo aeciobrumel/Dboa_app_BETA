@@ -34,7 +34,7 @@ export default function Grounding54321() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: tokens.colors.bg, padding: 24 },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
-  title: { color: tokens.colors.text, fontSize: 24, fontWeight: '700', textAlign: 'center' },
+  title: { color: tokens.colors.text, fontSize: 24, textAlign: 'center', fontFamily: 'Lemondrop-Bold' },
   subtitle: { color: tokens.colors.textMuted, fontSize: 16, textAlign: 'center' },
   footer: { gap: 8, paddingBottom: 8 }
 });

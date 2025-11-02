@@ -72,15 +72,15 @@ export default function Settings() {
           <Controller name="narrationVolume" control={control} render={({ field: { value, onChange } }) => (
             <VolumeSlider value={value} onChange={onChange} accessibilityLabel={t('settings:narration')} />
           )} />
-          <View style={styles.rowStart}>
+          <View style={styles.rowWrap}>
             <Text style={styles.label}>{t('settings:bgMusic')}: </Text>
-            <Text style={{ color: settings.bgMusicUri ? tokens.colors.text : tokens.colors.textMuted }} numberOfLines={1}>
+            <Text style={{ color: settings.bgMusicUri ? tokens.colors.text : tokens.colors.textMuted }} numberOfLines={2}>
               {settings.bgMusicUri ? t('settings:customMusic', 'Música personalizada selecionada') : t('settings:defaultMusic', 'Usando música padrão')}
             </Text>
           </View>
-          <View style={styles.rowStart}>
+          <View style={styles.columnButtons}>
             <BigButton
-              variant="secondary"
+              variant="primary"
               label={t('settings:chooseMusic', 'Escolher música de fundo')}
               onPress={async () => {
                 try {
@@ -90,11 +90,13 @@ export default function Settings() {
                   if (uri) settings.setPreferences({ bgMusicUri: uri, bgEnabled: true });
                 } catch {}
               }}
+              style={{ width: '100%' }}
             />
             <BigButton
-              variant="secondary"
+              variant="primary"
               label={t('settings:resetMusic', 'Usar música padrão')}
               onPress={() => settings.setPreferences({ bgMusicUri: undefined })}
+              style={{ width: '100%' }}
             />
           </View>
         </View>
@@ -102,7 +104,7 @@ export default function Settings() {
         <View style={styles.section}>
           <Text style={styles.subsection}>{t('settings:voiceTitle', 'Voz da narração')}</Text>
           <Controller name="ttsVoice" control={control} render={({ field: { value, onChange } }) => (
-            <View style={styles.rowStart}>
+            <View style={styles.chipsRow}>
               <Text onPress={() => onChange('auto')} style={[styles.chip, value === 'auto' && styles.chipActive]} accessibilityRole="button">{t('settings:voiceAuto', 'Auto')}</Text>
               <Text onPress={() => onChange('female')} style={[styles.chip, value === 'female' && styles.chipActive]} accessibilityRole="button">{t('settings:voiceFemale', 'Feminina')}</Text>
               <Text onPress={() => onChange('male')} style={[styles.chip, value === 'male' && styles.chipActive]} accessibilityRole="button">{t('settings:voiceMale', 'Masculina')}</Text>
@@ -120,7 +122,7 @@ export default function Settings() {
           )} />
 
           <BigButton
-            variant="secondary"
+            variant="primary"
             label={t('settings:voicePreview', 'Pré‑visualizar voz')}
             onPress={async () => {
               const ok = await preferredVoiceAvailable();
@@ -129,7 +131,7 @@ export default function Settings() {
                 setTimeout(() => speak(t('settings:voiceWarnNotAvailable', 'Aviso: a voz escolhida pode não estar disponível neste dispositivo. Usaremos a alternativa disponível.')), 600);
               }
             }}
-            style={{ marginTop: 8 }}
+            style={{ marginTop: 12 }}
           />
         </View>
 
@@ -157,7 +159,7 @@ export default function Settings() {
         <View style={styles.section}>
           <Text style={styles.label}>{t('settings:cardsSection', 'Cartões')}</Text>
           <BigButton
-            variant="secondary"
+            variant="primary"
             label={t('settings:restoreCards', 'Restaurar cartões padrão')}
             onPress={() => {
               Alert.alert(
@@ -186,15 +188,18 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: tokens.colors.bg },
   scroll: { padding: 24, gap: 20, alignItems: 'stretch' },
-  section: { width: '100%', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: tokens.colors.secondary },
+  section: { width: '100%', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: tokens.colors.secondary, gap: 10 },
   panel: {},
   rowStart: { flexDirection: 'row', gap: 12, alignItems: 'center' },
   rowJustify: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: 560 },
   title: { color: tokens.colors.text, fontSize: 22, marginBottom: 12, fontWeight: '600', textAlign: 'center' },
   label: { color: tokens.colors.text, fontSize: 16, marginTop: 8, textAlign: 'left' },
-  subsection: { color: tokens.colors.text, fontSize: 16, marginTop: 12, fontWeight: '700', textAlign: 'left' },
+  subsection: { color: tokens.colors.text, fontSize: 16, marginTop: 12, textAlign: 'left', fontFamily: 'Lemondrop-Bold' },
   lang: { color: tokens.colors.textMuted, fontSize: 16, padding: 8 },
-  langActive: { color: tokens.colors.primary, fontWeight: '700', textDecorationLine: 'underline' },
+  langActive: { color: tokens.colors.primary, textDecorationLine: 'underline', fontFamily: 'Lemondrop-Bold' },
   chip: { color: tokens.colors.textMuted, borderWidth: 1, borderColor: tokens.colors.secondary, paddingVertical: 6, paddingHorizontal: 10, borderRadius: 12 },
-  chipActive: { backgroundColor: tokens.colors.secondary, color: '#000' }
+  chipActive: { backgroundColor: tokens.colors.secondary, color: '#000' },
+  rowWrap: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
+  columnButtons: { gap: 10, alignItems: 'stretch', paddingTop: 8 },
+  chipsRow: { flexDirection: 'row', gap: 10, flexWrap: 'wrap' }
 });

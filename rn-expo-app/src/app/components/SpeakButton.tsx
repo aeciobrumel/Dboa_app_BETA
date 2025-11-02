@@ -29,6 +29,5 @@ export default function SpeakButton({ text, style }: Props) {
 
 const styles = StyleSheet.create({
   btn: { backgroundColor: tokens.colors.secondary, borderRadius: 10, padding: 12, alignItems: 'center' },
-  text: { color: '#000', fontWeight: '700' }
+  text: { color: '#FFFFFF', fontFamily: 'Lemondrop-Bold' }
 });
-

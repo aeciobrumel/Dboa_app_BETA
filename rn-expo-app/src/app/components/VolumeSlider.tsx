@@ -24,7 +24,6 @@ export default function VolumeSlider({ value, onChange, accessibilityLabel }: Pr
 const styles = StyleSheet.create({
   container: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   btn: { backgroundColor: tokens.colors.secondary, borderRadius: 10, padding: 10 },
-  btnText: { fontWeight: '700' },
+  btnText: { fontFamily: 'Lemondrop-Bold', color: '#FFFFFF' },
   value: { color: tokens.colors.text, fontSize: 16, width: 56, textAlign: 'center' }
 });
-

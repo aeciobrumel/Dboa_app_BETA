@@ -25,6 +25,6 @@ export default function SessionEnd() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: tokens.colors.bg, padding: 24 },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  title: { color: tokens.colors.text, fontSize: 24, fontWeight: '700', textAlign: 'center' },
+  title: { color: tokens.colors.text, fontSize: 24, textAlign: 'center', fontFamily: 'Lemondrop-Bold' },
   footer: { paddingBottom: 8 }
 });

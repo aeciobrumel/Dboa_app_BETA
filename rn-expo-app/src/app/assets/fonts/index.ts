@@ -3,10 +3,10 @@
 // (ex.: assets/fonts/LemonDrop.ttf) e descomente a linha abaixo ajustando o caminho.
 
 export const customFonts: Record<string, any> = {
-  // Regular
-  Lemondrop: require('../../../../assets/fonts/Lemondrop.ttf'),
+  // Regular (arquivos estão na MESMA pasta deste index.ts)
+  Lemondrop: require('./Lemondrop.ttf'),
   // Variações opcionais (se existirem)
-  'Lemondrop-Bold': require('../../../../assets/fonts/Lemondrop Bold.ttf'),
-  'Lemondrop-Italic': require('../../../../assets/fonts/Lemondrop Italic.ttf'),
-  'Lemondrop-BoldItalic': require('../../../../assets/fonts/Lemondrop Bold Italic.ttf')
+  'Lemondrop-Bold': require('./Lemondrop Bold.ttf'),
+  'Lemondrop-Italic': require('./Lemondrop Italic.ttf'),
+  'Lemondrop-BoldItalic': require('./Lemondrop Bold Italic.ttf')
 };

@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   },
   primary: { backgroundColor: tokens.colors.primary },
   secondary: { backgroundColor: tokens.colors.secondary },
-  text: { fontWeight: '700', fontSize: 18 },
+  text: { fontSize: 18, fontFamily: 'Lemondrop-Bold' },
   textOnPrimary: { color: '#FFFFFF' },
-  textOnSecondary: { color: '#000000' }
+  textOnSecondary: { color: '#FFFFFF' }
 });

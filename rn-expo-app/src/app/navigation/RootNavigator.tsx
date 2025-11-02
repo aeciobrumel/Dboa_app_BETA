@@ -4,6 +4,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from '@app/screens/Home';
 import Settings from '@app/screens/Settings';
+import HomeIcon from '../../../assets/svg/home.svg';
+import CardsIcon from '../../../assets/svg/cards.svg';
+import SettingsIcon from '../../../assets/svg/settings.svg';
+import { tokens } from '@app/theme/tokens';
 import Onboarding from '@app/screens/Onboarding';
 import { SessionNavigator } from './SessionNavigator';
 import { CardsNavigator } from './CardsNavigator';
@@ -19,7 +23,21 @@ const Tab = createBottomTabNavigator();
 
 function Tabs() {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ focused, size, color }) => {
+          const fill = focused ? tokens.colors.primary : tokens.colors.secondary;
+          const props = { width: size ?? 22, height: size ?? 22, fill } as any;
+          if (route.name === 'Home') return <HomeIcon {...props} />;
+          if (route.name === 'Cards') return <CardsIcon {...props} />;
+          if (route.name === 'Settings') return <SettingsIcon {...props} />;
+          return null;
+        },
+        tabBarActiveTintColor: tokens.colors.primary,
+        tabBarInactiveTintColor: tokens.colors.secondary
+      })}
+    >
       <Tab.Screen name="Home" component={Home} options={{ title: 'Home' }} />
       <Tab.Screen name="Cards" component={CardsNavigator} options={{ title: 'Cards' }} />
       <Tab.Screen name="Settings" component={Settings} options={{ title: 'Settings' }} />

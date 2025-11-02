@@ -38,7 +38,7 @@ export default function BreathEditor() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: tokens.colors.bg, padding: 16, gap: 12 },
-  title: { color: tokens.colors.text, fontSize: 22, fontWeight: '700' },
+  title: { color: tokens.colors.text, fontSize: 22, fontFamily: 'Lemondrop-Bold' },
   label: { color: tokens.colors.text, fontSize: 14 },
   input: {
     backgroundColor: '#F4F6FA',
@@ -52,4 +52,3 @@ const styles = StyleSheet.create({
   },
   hint: { color: tokens.colors.textMuted }
 });
-

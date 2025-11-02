@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
     padding: 24
   },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
-  title: { color: tokens.colors.text, fontSize: 24, fontWeight: '700', textAlign: 'center' },
+  title: { color: tokens.colors.text, fontSize: 24, textAlign: 'center', fontFamily: 'Lemondrop-Bold' },
   subtitle: { color: tokens.colors.textMuted, fontSize: 16, textAlign: 'center' },
   ballContainer: {
     width: 220,

@@ -48,7 +48,6 @@ export default function UserCardsSession() {
   const current = sessionItems[index];
   const [waveSeed, setWaveSeed] = useState<number>(Date.now());
   const total = sessionItems.length;
-  const isLast = index >= total - 1;
 
   // Atualiza seed dos waves a cada troca de item para variar visual
   useEffect(() => { setWaveSeed(Date.now() + Math.floor(Math.random() * 1000000)); }, [index, current?.type]);
@@ -113,23 +112,14 @@ export default function UserCardsSession() {
         )}
       </View>
       <View style={styles.footer}>
-        {!isLast ? (
-          <BigButton
-            label={t('common.next', { ns: 'app' })}
-            onPress={() => {
-              stopSpeaking();
-              setIndex(p => p + 1);
-            }}
-          />
-        ) : (
-          <BigButton
-            label={t('common.finish', { ns: 'app' })}
-            onPress={() => {
-              stopSpeaking();
-              navigation.navigate('SessionEnd' as never);
-            }}
-          />
-        )}
+        <BigButton
+          label={t('common.next', { ns: 'app' })}
+          onPress={() => {
+            stopSpeaking();
+            // Avança e, ao chegar no fim, volta ao início (loop)
+            setIndex(p => ((p + 1) % Math.max(1, total)));
+          }}
+        />
         <BigButton
           variant="secondary"
           label={t('common.end', { ns: 'app' })}
@@ -147,7 +137,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: tokens.colors.bg, padding: 24, position: 'relative' },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
   step: { color: tokens.colors.textMuted, marginBottom: 4 },
-  title: { color: tokens.colors.text, fontSize: 24, fontWeight: '700', textAlign: 'center' },
+  title: { color: tokens.colors.text, fontSize: 24, textAlign: 'center', fontFamily: 'Lemondrop-Bold' },
   subtitle: { color: tokens.colors.textMuted, fontSize: 16, textAlign: 'center' },
   footer: { gap: 8, paddingBottom: 8 },
   hero: { width: '100%', height: 220, borderRadius: 12, marginVertical: 12 }

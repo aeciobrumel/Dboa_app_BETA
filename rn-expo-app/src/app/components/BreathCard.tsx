@@ -88,10 +88,9 @@ export default function BreathCard({ onDone, cycles = 4 }: Props) {
 
 const styles = StyleSheet.create({
   container: { alignItems: 'center', gap: 8 },
-  title: { color: tokens.colors.text, fontSize: 22, fontWeight: '700', textAlign: 'center' },
+  title: { color: tokens.colors.text, fontSize: 22, textAlign: 'center', fontFamily: 'Lemondrop-Bold' },
   subtitle: { color: tokens.colors.textMuted, fontSize: 14, textAlign: 'center' },
   ballContainer: { width: 200, height: 200, alignItems: 'center', justifyContent: 'center' },
   ball: { width: 110, height: 110, borderRadius: 110, backgroundColor: '#36507D' },
   hint: { color: tokens.colors.textMuted }
 });
-
