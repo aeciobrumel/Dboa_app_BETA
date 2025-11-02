@@ -2,6 +2,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+// Navegação principal (Tabs + Stacks). Ícones do menu inferior carregados de assets/svg
 import Home from '@app/screens/Home';
 import Settings from '@app/screens/Settings';
 import HomeIcon from '../../../assets/svg/home.svg';

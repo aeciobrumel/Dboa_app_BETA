@@ -49,7 +49,7 @@ export default function UserCardsSession() {
   const [waveSeed, setWaveSeed] = useState<number>(Date.now());
   const total = sessionItems.length;
 
-  // Atualiza seed dos waves a cada troca de item para variar visual
+  // Atualiza seed dos blobs/ondas a cada troca de item para variar o visual
   useEffect(() => { setWaveSeed(Date.now() + Math.floor(Math.random() * 1000000)); }, [index, current?.type]);
 
   // Auto TTS controlado pela preferência (padrão desligado) — apenas para cartões de texto
@@ -112,6 +112,7 @@ export default function UserCardsSession() {
         )}
       </View>
       <View style={styles.footer}>
+        {/* Próximo: avança em loop; Encerrar: sai da sessão */}
         <BigButton
           label={t('common.next', { ns: 'app' })}
           onPress={() => {

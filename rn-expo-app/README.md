@@ -17,6 +17,8 @@ Aplicativo React Native com Expo, focado em ajudar durante crises de ansiedade c
 - Estado: Zustand (persistido) | Formulários: React Hook Form
 - i18n: react-i18next com namespaces (app, cards, onboarding, settings)
 - Áudio: expo-av | Haptics: expo-haptics | Offline: expo-asset/FileSystem
+- TTS: expo-speech (nativo) + SpeechSynthesis (web)
+- SVG: react-native-svg + react-native-svg-transformer
 - Persistência: AsyncStorage
 - Qualidade: ESLint + Prettier + Husky + lint-staged, Jest + RNTL
 - CI/Build: EAS/Expo
@@ -105,6 +107,12 @@ rn-expo-app/
 - npm start
 - npm run android | ios | web
 
+5. Sincronizar dependências com a versão do Expo (recomendado quando aparecer aviso no terminal):
+
+- npx expo install
+
+Se o terminal listar versões “expected”, use exatamente as sugeridas (ex.: `npx expo install react-native-screens@3.31.1`).
+
 ## Build com EAS
 
 - npm i -g eas-cli
@@ -118,7 +126,10 @@ OTA (expo-updates) já habilitado por padrão no Expo. Ajuste `app.json` conform
 ## Identidade visual
 
 - Paleta: #36507D (primária), #A6B3C8, #B4B1C6, #F8DBD8 e superfície #FEF3DD
-- Tipografia: fallback de sistema (adicione Inter/Poppins depois)
+- Tipografia (Lemondrop):
+  - Coloque os arquivos em `src/app/assets/fonts/` com estes nomes: `Lemondrop.ttf`, `Lemondrop Bold.ttf`, `Lemondrop Italic.ttf`, `Lemondrop Bold Italic.ttf`.
+  - O carregamento está em `src/App.tsx` e o mapeamento em `src/app/assets/fonts/index.ts`.
+  - O app aplica Lemondrop globalmente; para negrito usamos `fontFamily: 'Lemondrop-Bold'` (evita fallback do SO).
 - Modo claro por padrão (ver `src/App.tsx` e `tokens.ts`)
 
 ## Mapeamento da migração (Java → React Native)
@@ -242,12 +253,10 @@ Todos os arquivos foram comentados em português onde relevante. Dúvidas ou pre
 
 - Padrão do app: arquivo local `assets/audio/background.mp3`.
   - Onde trocar no código: `src/app/assets/audio/sources.native.ts` (const `background`).
-  - Basta substituir o arquivo em `assets/audio/background.mp3` e reiniciar.
-- Player global: `src/app/components/GlobalBackgroundAudio.tsx` reproduz a música em loop e respeita o volume de "Música de fundo" nas Configurações.
-- Ducking automático: quando a narração/TTS fala, o volume da música é reduzido e volta ao normal ao terminar (`src/app/utils/speak.ts`).
-- Música personalizada do usuário:
-  - Em Configurações, toque em "Escolher música de fundo" para selecionar um arquivo de áudio do dispositivo. Para voltar ao padrão, toque em "Usar música padrão".
-  - Campo salvo em `useSettingsStore.bgMusicUri`.
+  - Substitua o arquivo e rode `npx expo start -c`.
+- Player global: `src/app/components/GlobalBackgroundAudio.tsx` (loop + volume + ducking).
+- Ducking automático: quando a narração/TTS fala, reduz temporariamente o volume (`src/app/utils/speak.ts`).
+- Música personalizada: Configurações → "Escolher música de fundo" (usa `expo-document-picker`). Voltar ao padrão: "Usar música padrão".
 ## Ícones do menu inferior (SVG)
 
 - Coloque seus ícones em `assets/svg/` com estes nomes:
@@ -259,3 +268,25 @@ Todos os arquivos foram comentados em português onde relevante. Dúvidas ou pre
   - Ícones de exemplo (pode substituir à vontade): `assets/svg/{home,cards,settings}.svg`
 - Uso no código: o Tab Navigator importa esses SVGs e renderiza como ícones
   - Veja `src/app/navigation/RootNavigator.tsx`.
+
+## Voz da narração (TTS)
+
+- Configurações → Voz da narração: escolha Auto/Feminina/Masculina, Velocidade e Tom.
+- Botão "Pré‑visualizar voz" reproduz uma amostra. Se a voz escolhida não existir no dispositivo, o app avisa por voz e usa a alternativa disponível.
+- Implementação: `src/app/utils/speak.ts` (web + nativo), ajustes em `src/app/state/useSettingsStore.ts` e tela `src/app/screens/Settings.tsx`.
+
+## Cartões: galeria e reordenar
+
+- Galeria: 2 colunas com tamanho fixo (cartas), sombra e preview de título + conteúdo.
+- Reordenar: segure o handle "≡" para arrastar. A ordem é persistida. O card "Respiração guiada" também pode ser reposicionado.
+- Implementação: `src/app/screens/cards/CardsList.tsx`.
+
+## Sessão em looping
+
+- A sessão percorre os cartões em loop e só termina quando você tocar em "Encerrar".
+- Implementação: `src/app/screens/session/UserCardsSession.tsx`.
+
+## Formas orgânicas (decorativas)
+
+- Fundo de tela com blobs orgânicos nas bordas, mudando a cada avanço.
+- Arquivos: `src/app/components/OrganicBlobs.tsx` e `ScreenCornerShapes.tsx`.

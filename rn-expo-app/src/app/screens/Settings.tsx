@@ -67,11 +67,13 @@ export default function Settings() {
           )} />
         </View>
 
+        {/* Música de fundo + narração (volumes) */}
         <View style={styles.section}>
           <Text style={styles.label}>{t('settings:narration')}</Text>
           <Controller name="narrationVolume" control={control} render={({ field: { value, onChange } }) => (
             <VolumeSlider value={value} onChange={onChange} accessibilityLabel={t('settings:narration')} />
           )} />
+          {/* Linha de status + seleção de arquivo de música */}
           <View style={styles.rowWrap}>
             <Text style={styles.label}>{t('settings:bgMusic')}: </Text>
             <Text style={{ color: settings.bgMusicUri ? tokens.colors.text : tokens.colors.textMuted }} numberOfLines={2}>
@@ -101,6 +103,7 @@ export default function Settings() {
           </View>
         </View>
 
+        {/* Voz da narração: gênero + velocidade + tom + preview */}
         <View style={styles.section}>
           <Text style={styles.subsection}>{t('settings:voiceTitle', 'Voz da narração')}</Text>
           <Controller name="ttsVoice" control={control} render={({ field: { value, onChange } }) => (

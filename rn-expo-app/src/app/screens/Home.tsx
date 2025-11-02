@@ -12,6 +12,7 @@ export default function Home() {
   const { t } = useTranslation('app');
   const navigation = useNavigation();
 
+  // Ação do botão principal: inicia a sessão guiada
   const startNow = useCallback(() => {
     announce(t('a11y.startingSession'));
     navigation.navigate('Session' as never);
@@ -20,6 +21,7 @@ export default function Home() {
   return (
     <View style={styles.container} accessibilityLabel={t('home.accessibilityLabel')}>
       <StatusBar barStyle="dark-content" />
+      {/* Logo centralizado na Home */}
       <View style={styles.logoWrap}>
         <Image
           source={require('../../../assets/svg/logo.png')}
