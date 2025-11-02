@@ -5,5 +5,24 @@
   "narration": "Narração",
   "haptics": "Vibração ao tocar",
   "telemetry": "Participar anonimamente de métricas (opt-in)"
+  ,"cardsSection": "Cartões"
+  ,"restoreCards": "Restaurar cartões padrão"
+  ,"restoreConfirmTitle": "Restaurar cartões?"
+  ,"restoreConfirmBody": "Isso substituirá seus cartões atuais pelos padrões."
+  ,"restoreConfirmOk": "Restaurar"
+  ,"restoreDoneTitle": "Feito"
+  ,"restoreDoneBody": "Cartões padrão restaurados."
+  ,"voiceTitle": "Voz da narração"
+  ,"voiceAuto": "Auto"
+  ,"voiceFemale": "Feminina"
+  ,"voiceMale": "Masculina"
+  ,"rate": "Velocidade"
+  ,"pitch": "Tom"
+  ,"voicePreview": "Pré‑visualizar voz"
+  ,"voicePreviewText": "Olá, esta é a voz que vai te guiar."
+  ,"chooseMusic": "Escolher música de fundo"
+  ,"resetMusic": "Usar música padrão"
+  ,"customMusic": "Música personalizada selecionada"
+  ,"defaultMusic": "Usando música padrão"
+  ,"voiceWarnNotAvailable": "Aviso: a voz escolhida pode não estar disponível neste dispositivo. Usaremos a alternativa disponível."
 }
-

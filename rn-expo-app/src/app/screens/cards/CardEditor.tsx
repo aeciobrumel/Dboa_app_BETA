@@ -1,6 +1,7 @@
 // Editor de cartão: criar/editar com React Hook Form
-import React, { useEffect } from 'react';
-import { View, StyleSheet, Text, TextInput } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Text, TextInput, Image, Platform } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -22,20 +23,40 @@ export default function CardEditor() {
     defaultValues: { title: '', body: '' }
   });
   const live = useWatch({ control });
+  const [imagePreview, setImagePreview] = useState<string | undefined>(
+    current?.imageBase64 ? `data:image/jpeg;base64,${current.imageBase64}` : current?.imageUri
+  );
+  const [imagePayload, setImagePayload] = useState<{ uri?: string; base64?: string } | undefined>(
+    current?.imageBase64 || current?.imageUri ? { uri: current?.imageUri, base64: current?.imageBase64 } : undefined
+  );
 
   useEffect(() => {
     if (current) {
       setValue('title', current.title);
       setValue('body', current.body);
+      setImagePreview(current.imageBase64 ? `data:image/jpeg;base64,${current.imageBase64}` : current.imageUri);
+      setImagePayload(current.imageBase64 || current.imageUri ? { uri: current.imageUri, base64: current.imageBase64 } : undefined);
     }
   }, [current, setValue]);
 
   const onSubmit = async (data: FormValues) => {
     if (!data.title?.trim()) return; // título obrigatório simples
     if (current) {
-      await updateCard(current.id, { title: data.title.trim(), body: data.body ?? '' });
+      await updateCard(current.id, {
+        title: data.title.trim(),
+        body: data.body ?? '',
+        imageUri: imagePayload?.uri,
+        imageBase64: imagePayload?.base64
+      });
     } else {
-      await addCard({ title: data.title.trim(), body: data.body ?? '', favorite: false, useBgMusic: false });
+      await addCard({
+        title: data.title.trim(),
+        body: data.body ?? '',
+        favorite: false,
+        useBgMusic: false,
+        imageUri: imagePayload?.uri,
+        imageBase64: imagePayload?.base64
+      } as any);
     }
     nav.goBack();
   };
@@ -86,18 +107,56 @@ export default function CardEditor() {
         )}
       />
 
+      {/* Imagem (opcional) */}
+      {imagePreview ? (
+        <>
+          <Image source={{ uri: imagePreview }} style={styles.image} resizeMode="cover" />
+          <BigButton
+            variant="secondary"
+            label={t('user.imageRemove', 'Remover imagem')}
+            onPress={() => {
+              setImagePreview(undefined);
+              setImagePayload(undefined);
+            }}
+          />
+        </>
+      ) : (
+        <BigButton
+          variant="secondary"
+          label={t('user.imageAdd', 'Adicionar imagem')}
+          onPress={async () => {
+            try {
+              const res = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                quality: 0.7,
+                base64: Platform.OS === 'web' // guarda base64 no web para persistir
+              });
+              if (res.canceled) return;
+              const asset = res.assets?.[0];
+              if (!asset) return;
+              const preview = asset.base64
+                ? `data:${asset.type || 'image/jpeg'};base64,${asset.base64}`
+                : asset.uri;
+              setImagePreview(preview);
+              setImagePayload({ uri: asset.base64 ? undefined : asset.uri, base64: asset.base64 });
+            } catch (_) {
+              // ignore
+            }
+          }}
+        />
+      )}
+
       <BigButton label={t('user.save', 'Salvar')} onPress={handleSubmit(onSubmit)} />
       {/* Botão para ouvir o cartão (texto atual do formulário) */}
       <BigButton
         variant="secondary"
         label={t('user.listen', 'Ouvir cartão')}
         onPress={() => {
-          const title = live?.title ?? '';
-          const body = live?.body ?? '';
-          const text = `${title}. ${body}`.trim();
-          if (text) {
+          const body = (live?.body ?? '').trim();
+          if (body) {
             // Import lazy para não pesar bundle
-            import('@app/utils/speak').then(m => m.speak(text));
+            import('@app/utils/speak').then(m => m.speak(body));
           }
         }}
       />

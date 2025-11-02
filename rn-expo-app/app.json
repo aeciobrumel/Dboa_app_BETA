@@ -16,11 +16,16 @@
       "supportsTablet": false
     },
     "android": {},
-    "web": { "bundler": "metro" },
+    "web": {
+      "bundler": "metro"
+    },
     "extra": {
       "eas": {
         "projectId": "00000000-0000-0000-0000-000000000000"
       }
-    }
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

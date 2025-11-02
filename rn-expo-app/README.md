@@ -82,12 +82,12 @@ rn-expo-app/
 
 ## Setup
 
-1) Criar app Expo TypeScript (ou usar esta pasta `rn-expo-app/` diretamente):
+1. Criar app Expo TypeScript (ou usar esta pasta `rn-expo-app/` diretamente):
 
 - npx create-expo-app@latest coping-cards -t expo-template-blank-typescript
 - cd coping-cards
 
-2) Instalar dependências:
+2. Instalar dependências:
 
 - npm i @react-navigation/native @react-navigation/native-stack @react-navigation/bottom-tabs react-native-screens react-native-safe-area-context react-native-gesture-handler
 - npm i i18next react-i18next
@@ -95,12 +95,12 @@ rn-expo-app/
 - npm i expo-av expo-asset expo-file-system expo-haptics
 - npm i -D typescript @types/react @types/react-native jest jest-expo @testing-library/react-native @testing-library/jest-native eslint prettier husky lint-staged @types/jest @babel/core
 
-3) Scripts e hooks (já inclusos em `package.json`):
+3. Scripts e hooks (já inclusos em `package.json`):
 
 - npm run prepare (instala husky)
 - Gatilho pre-commit executa lint-staged (ESLint/Prettier)
 
-4) Rodar em dev:
+4. Rodar em dev:
 
 - npm start
 - npm run android | ios | web
@@ -163,7 +163,7 @@ Checklist rápido:
 
 ## Offline
 
-- Assets críticos pré-carregados em `src/App.tsx` via `ensureOfflineAssets`. 
+- Assets críticos pré-carregados em `src/App.tsx` via `ensureOfflineAssets`.
 - Incluir arquivos reais em `assets/audio/` (ver `assets/README.md`).
 - `assetBundlePatterns` definido em `app.json` para empacotar assets na build.
 
@@ -185,15 +185,16 @@ Checklist rápido:
 
 ## Como iniciar a sessão em até 3 toques
 
-- App aberto → 1) Toque em “Começar agora”. 
+- App aberto → 1) Toque em “Começar agora”.
 - (Opcional) Troca de idioma é 1 toque e é persistente; não bloqueia o fluxo.
-- Fluxo sem modais/pedidos extras; sessão inicia com áudio e instruções.
+- Fluxo sem modais/pedidos extras; a sessão inicia com o exercício de respiração guiada e áudio.
 
 ## Cartões personalizados (CRUD) e TTS
 
 - Aba “Cards” permite criar/editar/excluir cartões pessoais.
-- Botão “Ouvir cartão” lê o conteúdo via TTS (nativo: expo-speech; web: SpeechSynthesis).
-- Ao tocar em “Começar agora”, a sessão abre em “UserCardsSession” e já começa a ler o primeiro cartão automaticamente. Use “Próximo” para avançar e “Concluir” para terminar. Pressionar e segurar no botão de ouvir interrompe a fala.
+- Aba “Cards” inclui também o card "Respiração guiada" (editável: ciclos).
+- Botão “Ouvir cartão” lê apenas o conteúdo do cartão (sem o título) via TTS (nativo: expo-speech; web: SpeechSynthesis).
+- Ao tocar em “Começar agora”, a sessão abre diretamente na lista de cartões, onde o primeiro card é um exercício de Respiração guiada. Após esse card, vêm os seus cartões personalizados. Por padrão, os cartões não são lidos automaticamente; a leitura ocorre somente ao tocar em “Ouvir cartão”. É possível reativar a leitura automática em Configurações → “Leitura automática dos cartões”. Use “Próximo” para avançar e “Concluir” para terminar. Pressionar e segurar no botão de ouvir interrompe a fala.
 
 Observação: em Web o feedback háptico não é suportado; usamos no-op para evitar erros.
 
@@ -206,6 +207,7 @@ Observação: em Web o feedback háptico não é suportado; usamos no-op para ev
 ## Como rodar (resumido)
 
 Passos rápidos:
+
 1. Instale Node 16+ e npm ou yarn.
 2. No diretório do projeto, instale dependências:
    - npm install
@@ -221,7 +223,8 @@ Passos rápidos:
    - eas build -p android --profile production
 
 Soluções rápidas para problemas comuns:
-- Limpar cache do Metro: npm start -- --clear  (ou expo start -c)
+
+- Limpar cache do Metro: npm start -- --clear (ou expo start -c)
 - Reinstalar dependências: rm -rf node_modules && npm install
 - Erros nativos/permissions (macOS): instale watchman: brew install watchman
 - Se o Expo Go não abrir: verifique a mesma rede Wi‑Fi ou use tunnel/lan no Metro
@@ -235,3 +238,13 @@ Soluções rápidas para problemas comuns:
 ---
 
 Todos os arquivos foram comentados em português onde relevante. Dúvidas ou preferências (por exemplo, trocar Zustand por Redux Toolkit) — posso ajustar rapidamente.
+## Música de fundo (loop)
+
+- Padrão do app: arquivo local `assets/audio/background.mp3`.
+  - Onde trocar no código: `src/app/assets/audio/sources.native.ts` (const `background`).
+  - Basta substituir o arquivo em `assets/audio/background.mp3` e reiniciar.
+- Player global: `src/app/components/GlobalBackgroundAudio.tsx` reproduz a música em loop e respeita o volume de "Música de fundo" nas Configurações.
+- Ducking automático: quando a narração/TTS fala, o volume da música é reduzido e volta ao normal ao terminar (`src/app/utils/speak.ts`).
+- Música personalizada do usuário:
+  - Em Configurações, toque em "Escolher música de fundo" para selecionar um arquivo de áudio do dispositivo. Para voltar ao padrão, toque em "Usar música padrão".
+  - Campo salvo em `useSettingsStore.bgMusicUri`.

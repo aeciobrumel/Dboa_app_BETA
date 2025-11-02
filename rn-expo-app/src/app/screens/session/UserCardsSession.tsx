@@ -1,6 +1,8 @@
 // Sessão dinâmica: percorre os cartões criados pelo usuário, com TTS e botões no rodapé
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, StyleSheet, Text, BackHandler } from 'react-native';
+import { View, StyleSheet, Text, BackHandler, Image } from 'react-native';
+import ScreenCornerShapes from '@app/components/ScreenCornerShapes';
+import OrganicBlobs from '@app/components/OrganicBlobs';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { useCardsStore } from '@app/state/useCardsStore';
@@ -8,11 +10,14 @@ import { tokens } from '@app/theme/tokens';
 import BigButton from '@app/components/BigButton';
 import SpeakButton from '@app/components/SpeakButton';
 import { speak, stopSpeaking } from '@app/utils/speak';
+import { useSettingsStore } from '@app/state/useSettingsStore';
+import BreathCard from '@app/components/BreathCard';
 
 export default function UserCardsSession() {
   const { t } = useTranslation(['cards', 'app']);
   const navigation = useNavigation();
   const { cards, hydrate } = useCardsStore();
+  const { autoReadCards, breathCycles, breathListIndex } = useSettingsStore();
   const [index, setIndex] = useState(0);
 
   // Bloquear botão físico de voltar durante a sessão
@@ -29,27 +34,41 @@ export default function UserCardsSession() {
 
   useEffect(() => () => stopSpeaking(), []);
 
-  const sorted = useMemo(() => {
-    // Favoritos primeiro, depois por atualização
-    return [...cards].sort((a, b) => (Number(b.favorite) - Number(a.favorite)) || b.updatedAt - a.updatedAt);
-  }, [cards]);
+  // Usa a ordem persistida pelo usuário na lista
+  const ordered = useMemo(() => cards, [cards]);
 
-  const current = sorted[index];
-  const total = sorted.length;
+  // Itens da sessão: insere respiração na posição configurada
+  const sessionItems = useMemo(() => {
+    const items = ordered.map(c => ({ type: 'card' as const, data: c }));
+    const idx = Math.max(0, Math.min(breathListIndex ?? 0, items.length));
+    items.splice(idx, 0, { type: 'breath' as const } as any);
+    return items;
+  }, [ordered, breathListIndex]);
+
+  const current = sessionItems[index];
+  const [waveSeed, setWaveSeed] = useState<number>(Date.now());
+  const total = sessionItems.length;
   const isLast = index >= total - 1;
 
-  // Auto TTS: ao entrar na tela e quando mudar de cartão
-  useEffect(() => {
-    if (!current) return;
-    const text = `${current.title}. ${current.body}`.trim();
-    if (text) speak(text);
-  }, [current]);
+  // Atualiza seed dos waves a cada troca de item para variar visual
+  useEffect(() => { setWaveSeed(Date.now() + Math.floor(Math.random() * 1000000)); }, [index, current?.type]);
 
-  if (total === 0) {
+  // Auto TTS controlado pela preferência (padrão desligado) — apenas para cartões de texto
+  useEffect(() => {
+    if (!autoReadCards) return;
+    if (!current) return;
+    if (current.type !== 'card') return;
+    const text = (current.data.body ?? '').trim();
+    if (text) speak(text);
+  }, [current, autoReadCards]);
+
+  // Considera apenas se não houver cartões do usuário (ainda haverá o card de respiração)
+  if (ordered.length === 0) {
     return (
       <View style={styles.container}>
         <View style={styles.content}>
-          <Text style={styles.title}>{t('user.empty', 'Nenhum cartão ainda')}</Text>
+          <BreathCard />
+          <Text style={[styles.title, { marginTop: 12 }]}>{t('user.empty', 'Nenhum cartão ainda')}</Text>
           <Text style={styles.subtitle}>{t('user.add', 'Adicionar cartão')}</Text>
         </View>
         <View style={styles.footer}>
@@ -64,13 +83,34 @@ export default function UserCardsSession() {
 
   return (
     <View style={styles.container}>
+      <ScreenCornerShapes />
+      <OrganicBlobs
+        seed={waveSeed}
+        count={7}
+        opacity={0.07}
+        variance={0.55}
+        safeTop={100}
+        safeBottom={80}
+        safeSides={30}
+      />
       <View style={styles.content}>
         <Text style={styles.step}>{`${index + 1}/${total}`}</Text>
-        <Text style={styles.title} accessibilityRole="header">
-          {current.title}
-        </Text>
-        <Text style={styles.subtitle}>{current.body}</Text>
-        <SpeakButton text={`${current.title}. ${current.body}`} style={{ marginTop: 12 }} />
+        {current?.type === 'breath' ? (
+          <BreathCard cycles={breathCycles} />
+        ) : (
+          <>
+            <Text style={styles.title} accessibilityRole="header">{current.data.title}</Text>
+            {(current.data.imageBase64 || current.data.imageUri) ? (
+              <Image
+                source={{ uri: current.data.imageBase64 ? `data:image/jpeg;base64,${current.data.imageBase64}` : current.data.imageUri }}
+                style={styles.hero}
+                resizeMode="cover"
+              />
+            ) : null}
+            <Text style={styles.subtitle}>{current.data.body}</Text>
+            <SpeakButton text={current.data.body} style={{ marginTop: 12 }} />
+          </>
+        )}
       </View>
       <View style={styles.footer}>
         {!isLast ? (
@@ -104,10 +144,11 @@ export default function UserCardsSession() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: tokens.colors.bg, padding: 24 },
+  container: { flex: 1, backgroundColor: tokens.colors.bg, padding: 24, position: 'relative' },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 8 },
   step: { color: tokens.colors.textMuted, marginBottom: 4 },
   title: { color: tokens.colors.text, fontSize: 24, fontWeight: '700', textAlign: 'center' },
   subtitle: { color: tokens.colors.textMuted, fontSize: 16, textAlign: 'center' },
-  footer: { gap: 8, paddingBottom: 8 }
+  footer: { gap: 8, paddingBottom: 8 },
+  hero: { width: '100%', height: 220, borderRadius: 12, marginVertical: 12 }
 });

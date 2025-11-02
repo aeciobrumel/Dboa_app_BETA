@@ -25,9 +25,9 @@ export function SessionNavigator() {
         gestureEnabled: false // Bloqueia gestos para evitar saída acidental
       }}
     >
-      {/* Inicia pela sessão dinâmica de cartões do usuário */}
+      {/* Inicia pela sessão dinâmica de cartões do usuário (primeiro card será respiração) */}
       <Stack.Screen name="UserCardsSession" component={UserCardsSession} />
-      {/* Sequência clássica permanece disponível como fallback/opcional */}
+      {/* Tela dedicada de respiração continua disponível caso precise acessar diretamente */}
       <Stack.Screen name="Breath" component={Breath} />
       <Stack.Screen name="Grounding54321" component={Grounding54321} />
       <Stack.Screen name="Affirmations" component={Affirmations} />

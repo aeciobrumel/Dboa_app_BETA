@@ -16,6 +16,8 @@
     "empty": "Aún no hay tarjetas",
     "add": "Agregar tarjeta",
     "addA11y": "Agregar nueva tarjeta",
+    "gallery": "Galería",
+    "reorder": "Reordenar",
     "edit": "Editar tarjeta",
     "title": "Título",
     "titlePh": "Ej.: Recuerda respirar...",
@@ -24,6 +26,8 @@
     "save": "Guardar",
     "delete": "Eliminar",
     "listen": "Escuchar tarjeta",
-    "stop": "Detener"
+    "stop": "Detener",
+    "imageAdd": "Agregar imagen",
+    "imageRemove": "Quitar imagen"
   }
 }

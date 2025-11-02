@@ -16,6 +16,8 @@
     "empty": "Nenhum cartão ainda",
     "add": "Adicionar cartão",
     "addA11y": "Adicionar novo cartão",
+    "gallery": "Galeria",
+    "reorder": "Reordenar",
     "edit": "Editar cartão",
     "title": "Título",
     "titlePh": "Ex.: Lembre-se de respirar...",
@@ -24,6 +26,8 @@
     "save": "Salvar",
     "delete": "Excluir",
     "listen": "Ouvir cartão",
-    "stop": "Parar"
+    "stop": "Parar",
+    "imageAdd": "Adicionar imagem",
+    "imageRemove": "Remover imagem"
   }
 }

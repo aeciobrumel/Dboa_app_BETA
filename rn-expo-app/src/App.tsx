@@ -1,7 +1,8 @@
 // App principal do Expo com navegação, tema, i18n e pré-carregamento offline.
 import 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import React, { useEffect, useMemo, useState } from 'react';
-import { LogBox } from 'react-native';
+import { LogBox, Text, TextInput } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { enableScreens } from 'react-native-screens';
 import { Platform } from 'react-native';
@@ -11,6 +12,9 @@ import './app/i18n';
 import { tokens } from '@app/theme/tokens';
 import { ensureOfflineAssets } from '@app/utils/offline';
 import { background, narration_breath_es, narration_breath_pt } from '@app/assets/audio/sources';
+import { useFonts } from 'expo-font';
+import { customFonts } from '@app/assets/fonts';
+import GlobalBackgroundAudio from '@app/components/GlobalBackgroundAudio';
 
 if (Platform.OS !== 'web') {
   // Evita problemas de exibição no Web com react-native-screens
@@ -24,6 +28,7 @@ export default function App() {
   const theme = useMemo(() => DefaultTheme, []);
 
   const [isReady, setIsReady] = useState(false);
+  const [fontsLoaded] = useFonts(customFonts);
 
   useEffect(() => {
     // Pré-carrega assets críticos para offline (áudios e ícones)
@@ -41,11 +46,24 @@ export default function App() {
     prepare();
   }, []);
 
-  if (!isReady) return null;
+  useEffect(() => {
+    if (!fontsLoaded) return;
+    // Define fonte padrão globalmente quando carregada
+    tokens.typography.fontFamily = 'Lemondrop';
+    Text.defaultProps = Text.defaultProps || {};
+    Text.defaultProps.style = [{ fontFamily: 'Lemondrop' }, Text.defaultProps.style].filter(Boolean);
+    TextInput.defaultProps = TextInput.defaultProps || {};
+    TextInput.defaultProps.style = [{ fontFamily: 'Lemondrop' }, TextInput.defaultProps.style].filter(Boolean);
+  }, [fontsLoaded]);
+
+  if (!isReady || !fontsLoaded) return null;
 
   return (
-    <NavigationContainer theme={{ ...theme, colors: { ...theme.colors, primary: tokens.colors.primary, background: tokens.colors.bg } }}>
-      <RootNavigator />
-    </NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer theme={{ ...theme, colors: { ...theme.colors, primary: tokens.colors.primary, background: tokens.colors.bg } }}>
+        <GlobalBackgroundAudio />
+        <RootNavigator />
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }
