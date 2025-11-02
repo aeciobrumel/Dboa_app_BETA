@@ -1,5 +1,6 @@
 {
   "name": "coping-cards",
+  "description": "App Expo (RN) para coping cards: respiração guiada, cartões personalizados, TTS e música de fundo.",
   "version": "1.0.0",
   "private": true,
   "main": "expo/AppEntry",
