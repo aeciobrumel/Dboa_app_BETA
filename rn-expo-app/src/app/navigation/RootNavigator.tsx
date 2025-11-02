@@ -12,6 +12,7 @@ import { tokens } from '@app/theme/tokens';
 import Onboarding from '@app/screens/Onboarding';
 import { SessionNavigator } from './SessionNavigator';
 import { CardsNavigator } from './CardsNavigator';
+import Legal from '@app/screens/Legal';
 
 export type RootStackParamList = {
   Tabs: undefined;
@@ -56,6 +57,7 @@ export function RootNavigator() {
         component={SessionNavigator}
         options={{ headerShown: false, presentation: 'fullScreenModal' }}
       />
+      <RootStack.Screen name="Legal" component={Legal} options={{ title: 'Informações legais' }} />
     </RootStack.Navigator>
   );
 }

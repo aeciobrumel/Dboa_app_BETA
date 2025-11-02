@@ -183,6 +183,16 @@ export default function Settings() {
             }}
           />
         </View>
+
+        {/* Links úteis (Legal) */}
+        <View style={styles.section}>
+          <Text style={styles.label}>Informações legais</Text>
+          <BigButton
+            variant="secondary"
+            label="Política de Privacidade e Termos"
+            onPress={() => (navigation as any).navigate('Legal')}
+          />
+        </View>
       </ScrollView>
     </View>
   );

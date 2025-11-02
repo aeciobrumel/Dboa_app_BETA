@@ -1,6 +1,6 @@
 // Onboarding: pequenas preferências iniciais com RHF
 import React from 'react';
-import { View, StyleSheet, Text, Switch } from 'react-native';
+import { View, StyleSheet, Text, Switch, Pressable } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +27,12 @@ export default function Onboarding() {
     <View style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>{t('welcome')}</Text>
+        <Text style={styles.disclaimer}>
+          {t('disclaimer', 'Este app não substitui atendimento médico. Em emergência, procure ajuda local.')}
+        </Text>
+        <Pressable accessibilityRole="button" onPress={() => (navigation as any).navigate('Legal')}>
+          <Text style={styles.link}>{t('legalLink', 'Ver Política de Privacidade e Termos')}</Text>
+        </Pressable>
         <View style={styles.row}>
           <Text style={styles.label}>{t('enableHaptics')}</Text>
           <Controller
@@ -49,6 +55,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: tokens.colors.bg, padding: 24 },
   content: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 12 },
   title: { color: tokens.colors.text, fontSize: 22, marginBottom: 12, fontWeight: '600', textAlign: 'center' },
+  disclaimer: { color: tokens.colors.textMuted, fontSize: 14, textAlign: 'center', paddingHorizontal: 12 },
+  link: { color: tokens.colors.primary, textDecorationLine: 'underline', marginBottom: 8 },
   label: { color: tokens.colors.text, fontSize: 16 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%' },
   footer: { paddingBottom: 8 }

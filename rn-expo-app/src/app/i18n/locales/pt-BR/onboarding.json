@@ -1,6 +1,7 @@
 {
   "welcome": "Bem-vinda(o)! Vamos ajustar algumas preferências.",
   "enableHaptics": "Ativar vibração (haptics)",
-  "continue": "Continuar"
+  "continue": "Continuar",
+  "disclaimer": "Este app não substitui atendimento médico. Em emergência, procure ajuda local.",
+  "legalLink": "Ver Política de Privacidade e Termos"
 }
-

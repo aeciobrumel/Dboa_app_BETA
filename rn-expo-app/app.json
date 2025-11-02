@@ -6,6 +6,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "splash": { "backgroundColor": "#FFFFFF", "resizeMode": "contain" },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -13,15 +14,30 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": false
+      "supportsTablet": false,
+      "bundleIdentifier": "com.example.copingcards",
+      "buildNumber": "1.0.0",
+      "usesNonExemptEncryption": false,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Precisamos acessar suas imagens para você adicionar fotos aos cartões.",
+        "UIBackgroundModes": ["audio"]
+      }
     },
-    "android": {},
+    "android": {
+      "package": "com.example.copingcards",
+      "versionCode": 1,
+      "permissions": ["READ_MEDIA_IMAGES", "READ_MEDIA_AUDIO"]
+    },
     "web": {
       "bundler": "metro"
     },
     "extra": {
       "eas": {
         "projectId": "00000000-0000-0000-0000-000000000000"
+      },
+      "legal": {
+        "privacyUrl": "https://example.com/privacy",
+        "termsUrl": "https://example.com/terms"
       }
     },
     "plugins": [

@@ -316,6 +316,17 @@ Todos os arquivos foram comentados em português onde relevante. Dúvidas ou pre
 - Uso no código: o Tab Navigator importa esses SVGs e renderiza como ícones
   - Veja `src/app/navigation/RootNavigator.tsx`.
 
+## Conformidade e Privacidade
+
+- Política de Privacidade e Termos estão em `PRIVACY.md` e `TERMS.md` e possuem uma tela no app (Settings → Política de Privacidade e Termos).
+- Publique a política em uma URL e configure `app.json → expo.extra.legal` com `privacyUrl` e `termsUrl` para exibir os links externos.
+- Dados processados ficam somente no dispositivo (AsyncStorage). Não há coleta nem envio a servidores.
+- Permissões usadas:
+  - Biblioteca de fotos: anexar imagem aos cartões
+  - Arquivos (Android): escolher música de fundo personalizada
+  - Áudio em segundo plano: manter música de fundo (UIBackgroundModes=audio)
+- Data Safety (Play) e App Privacy (Apple): declare “sem coleta de dados”; uso apenas no dispositivo; detalhe permissões e finalidade.
+
 ## Voz da narração (TTS)
 
 - Configurações → Voz da narração: escolha Auto/Feminina/Masculina, Velocidade e Tom.
