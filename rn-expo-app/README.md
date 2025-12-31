@@ -123,6 +123,7 @@ Se o terminal listar versões “expected”, use exatamente as sugeridas (ex.: 
 
 OTA (expo-updates) já habilitado por padrão no Expo. Ajuste `app.json` conforme necessário.
 
+
 ## Build e Publicação (Android/iOS)
 
 Pré‑requisitos
@@ -163,6 +164,7 @@ Scripts prontos (package.json)
   - `npm run build:ios:preview` → TestFlight
   - `npm run build:ios` → App Store
 - Web
+  - `npm run build` → export web estático para `dist/` e replica em `build/` (ex.: Hostinger procura `build/`)
   - `npm run build:web`
 
 Dicas
