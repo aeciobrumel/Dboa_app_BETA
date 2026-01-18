@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
     "target": "es2017",
-    "lib": [
-      "es2017"
-    ],
+    "lib": ["es2017"],
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -18,20 +16,11 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/": [
-        "src/*"
-      ],
-      "@app/*": [
-        "src/app/*"
-      ]
+      "@/": ["src/*"],
+      "@app/*": ["src/app/*"]
     }
   },
-  "include": [
-    "src",
-    "__tests__"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
-  "extends": "expo/tsconfig.base"
+  "include": ["src", "__tests__"],
+  "exclude": ["node_modules"],
+  "extends": "./node_modules/expo/tsconfig.base.json"
 }

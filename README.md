@@ -5,14 +5,22 @@ App Expo (React Native) para coping cards: respiracao guiada, cartoes personaliz
 [![Versao](https://img.shields.io/badge/versao-1.0.0-blue)](./rn-expo-app/package.json)
 [![Expo](https://img.shields.io/badge/expo-app-000020?logo=expo&logoColor=white)](https://expo.dev/)
 [![React Native](https://img.shields.io/badge/react%20native-app-61DAFB?logo=react&logoColor=000)](https://reactnative.dev/)
-[![Licenca](https://img.shields.io/badge/licenca-UNLICENSED-lightgrey)](#licenca)
 
 ## Sumario
 
+- [Prints do app](#prints-do-app)
 - [Guia de instalacao](#guia-de-instalacao)
 - [Tecnologias utilizadas](#tecnologias-utilizadas)
 - [Contribuicao](#contribuicao)
 - [Licenca](#licenca)
+
+## Prints do app
+
+Coloque os prints em `rn-expo-app/assets/screenshots/` e atualize os links abaixo.
+
+![Tela inicial](rn-expo-app/assets/screenshots/home.png)
+![Sessao](rn-expo-app/assets/screenshots/session.png)
+![Cards](rn-expo-app/assets/screenshots/cards.png)
 
 ## Guia de instalacao
 
@@ -65,3 +73,7 @@ Contribuicoes sao bem-vindas!
 1. Faca um fork do projeto e crie sua branch.
 2. Execute `npm run lint` e `npm run test` antes do PR.
 3. Descreva claramente o problema e a solucao proposta.
+
+## Licenca
+
+Este projeto nao possui licenca definida para o codigo-fonte. Consulte `rn-expo-app/LICENSES.md` para licencas de terceiros.
