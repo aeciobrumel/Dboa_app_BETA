@@ -95,7 +95,7 @@ rn-expo-app/
 - npm i i18next react-i18next
 - npm i zustand react-hook-form @react-native-async-storage/async-storage
 - npm i expo-av expo-asset expo-file-system expo-haptics
-- npm i -D typescript @types/react @types/react-native jest jest-expo @testing-library/react-native @testing-library/jest-native eslint prettier husky lint-staged @types/jest @babel/core
+- npm i -D typescript @types/react jest jest-expo @testing-library/react-native eslint prettier husky lint-staged @types/jest @babel/core
 
 3. Scripts e hooks (já inclusos em `package.json`):
 
