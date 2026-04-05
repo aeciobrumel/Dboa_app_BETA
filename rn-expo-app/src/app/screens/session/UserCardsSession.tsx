@@ -22,10 +22,10 @@ import type { Card } from '@app/state/useCardsStore';
 import { tokens } from '@app/theme/tokens';
 import BigButton from '@app/components/BigButton';
 import SpeakButton from '@app/components/SpeakButton';
-import { speak, stopSpeaking } from '@app/utils/speak';
 import { useSettingsStore } from '@app/state/useSettingsStore';
 import BreathCard from '@app/components/BreathCard';
 import EmergencyButton from '@app/components/EmergencyButton';
+import * as audioService from '@app/utils/audioService';
 
 type SessionItem = { type: 'card'; data: Card } | { type: 'breath' };
 
@@ -55,7 +55,7 @@ export default function UserCardsSession() {
     hydrate();
   }, [hydrate]);
 
-  useEffect(() => () => stopSpeaking(), []);
+  useEffect(() => () => { void audioService.stop(); }, []);
 
   // Usa a ordem persistida pelo usuário na lista
   const ordered = useMemo(() => cards, [cards]);
@@ -76,12 +76,12 @@ export default function UserCardsSession() {
   const lastInteractionWasSwipe = useRef(false);
 
   const goNext = useCallback(() => {
-    stopSpeaking();
+    void audioService.stop();
     setIndex(previousIndex => ((previousIndex + 1) % Math.max(1, total)));
   }, [total]);
 
   const goPrevious = useCallback(() => {
-    stopSpeaking();
+    void audioService.stop();
     setIndex(previousIndex => (previousIndex - 1 + Math.max(1, total)) % Math.max(1, total));
   }, [total]);
 
@@ -150,8 +150,7 @@ export default function UserCardsSession() {
     if (!autoReadCards) return;
     if (!current) return;
     if (current.type !== 'card') return;
-    const text = (current.data.body ?? '').trim();
-    if (text) speak(text);
+    void audioService.play(current.data);
   }, [current, autoReadCards]);
 
   // Considera apenas se não houver cartões do usuário (ainda haverá o card de respiração)
@@ -230,7 +229,7 @@ export default function UserCardsSession() {
           accessibilityLabel={t('common.end', { ns: 'app' })}
           style={({ pressed }) => [styles.endAction, pressed ? styles.endActionPressed : null]}
           onPress={() => {
-            stopSpeaking();
+            void audioService.stop();
             navigation.navigate('SessionEnd');
           }}
         >

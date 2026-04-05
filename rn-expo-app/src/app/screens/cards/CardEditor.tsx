@@ -19,6 +19,7 @@ import Svg, { Circle, Line, Path, Polyline } from 'react-native-svg';
 import type { CardsStackParamList } from '@app/navigation/CardsNavigator';
 import { useCardsStore, type Card } from '@app/state/useCardsStore';
 import { tokens } from '@app/theme/tokens';
+import { narrateText, type CardCategory } from '@app/utils/narrateText';
 import { speak } from '@app/utils/speak';
 
 const MAX_TITLE_LENGTH = 100;
@@ -27,15 +28,15 @@ const MAX_BODY_LENGTH = 2000;
 type FormValues = {
   title: string;
   body: string;
+  narratedText: string;
 };
 
-type CategoryLabel = 'Respiração' | 'Segurança' | 'Resiliência' | 'Memória' | 'Presença';
-
 type CategoryTone = {
-  label: CategoryLabel;
+  value: CardCategory;
+  label: string;
   bg: string;
   stroke: string;
-  icon: 'timer' | 'shield' | 'arrow' | 'star' | 'sun';
+  icon: 'timer' | 'shield' | 'arrow' | 'star' | 'sun' | 'heart';
 };
 
 type ButtonVariant = 'secondary' | 'destructive';
@@ -68,38 +69,52 @@ const hexToRgba = (hex: string, alpha: number) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-const categoryTones: Record<CategoryLabel, CategoryTone> = {
-  Respiração: {
+const categoryTones: Record<CardCategory, CategoryTone> = {
+  crise: {
+    value: 'crise',
+    label: 'Crise',
+    bg: hexToRgba(tokens.colors.accent, 0.58),
+    stroke: tokens.colors.primary,
+    icon: 'shield',
+  },
+  respiracao: {
+    value: 'respiracao',
     label: 'Respiração',
     bg: hexToRgba(tokens.colors.secondary, 0.22),
     stroke: tokens.colors.primary,
     icon: 'timer',
   },
-  Segurança: {
-    label: 'Segurança',
-    bg: hexToRgba(tokens.colors.accent, 0.58),
+  aterramento: {
+    value: 'aterramento',
+    label: 'Aterramento',
+    bg: hexToRgba(tokens.colors.surfaceBlue, 0.88),
     stroke: tokens.colors.primary,
-    icon: 'shield',
+    icon: 'sun',
   },
-  Resiliência: {
-    label: 'Resiliência',
+  autocompaixao: {
+    value: 'autocompaixao',
+    label: 'Autocompaixão',
+    bg: hexToRgba(tokens.colors.tertiary, 0.26),
+    stroke: tokens.colors.primary,
+    icon: 'heart',
+  },
+  realidade: {
+    value: 'realidade',
+    label: 'Realidade',
     bg: hexToRgba(tokens.colors.surface, 0.96),
     stroke: tokens.colors.primary,
     icon: 'arrow',
   },
-  Memória: {
-    label: 'Memória',
-    bg: hexToRgba(tokens.colors.tertiary, 0.26),
+  'pos-crise': {
+    value: 'pos-crise',
+    label: 'Pós-crise',
+    bg: hexToRgba(tokens.colors.secondary, 0.14),
     stroke: tokens.colors.primary,
     icon: 'star',
   },
-  Presença: {
-    label: 'Presença',
-    bg: hexToRgba(tokens.colors.secondary, 0.14),
-    stroke: tokens.colors.primary,
-    icon: 'sun',
-  },
 };
+
+const categoryOptions = Object.values(categoryTones);
 
 function ChevronLeftIcon() {
   return (
@@ -279,6 +294,20 @@ function SunIcon({ color, size = 14 }: { color: string; size?: number }) {
   );
 }
 
+function HeartIcon({ color, size = 14 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" accessibilityElementsHidden>
+      <Path
+        d="M12 20.7L4.8 13.9C2.9 12.1 2.9 9.1 4.7 7.3C6.5 5.5 9.4 5.5 11.2 7.3L12 8.1L12.8 7.3C14.6 5.5 17.5 5.5 19.3 7.3C21.1 9.1 21.1 12.1 19.2 13.9L12 20.7Z"
+        stroke={color}
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
 function ImagePlusIcon() {
   return (
     <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" accessibilityElementsHidden>
@@ -373,6 +402,8 @@ function CategoryIcon({ tone, size = 14 }: { tone: CategoryTone; size?: number }
       return <StarIcon color={tone.stroke} size={size} />;
     case 'sun':
       return <SunIcon color={tone.stroke} size={size} />;
+    case 'heart':
+      return <HeartIcon color={tone.stroke} size={size} />;
     default:
       return <TimerIcon color={tone.stroke} size={size} />;
   }
@@ -458,7 +489,9 @@ export default function CardEditor() {
   const id = route.params?.id;
   const { cards, addCard, updateCard, removeCard } = useCardsStore();
   const current = cards.find(card => card.id === id);
-  const [category, setCategory] = useState<CategoryLabel>('Respiração');
+  const [category, setCategory] = useState<CardCategory>('realidade');
+  const [narrationExpanded, setNarrationExpanded] = useState(false);
+  const [didSeedNarration, setDidSeedNarration] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | undefined>(
     current?.imageBase64 ? `data:image/jpeg;base64,${current.imageBase64}` : current?.imageUri,
   );
@@ -469,16 +502,30 @@ export default function CardEditor() {
   );
 
   const { control, handleSubmit, setValue } = useForm<FormValues>({
-    defaultValues: { title: '', body: '' },
+    defaultValues: { title: '', body: '', narratedText: '' },
   });
 
   const live = useWatch({ control });
 
   useEffect(() => {
-    if (!current) return;
+    setNarrationExpanded(false);
 
+    if (!current) {
+      setCategory('realidade');
+      setDidSeedNarration(false);
+      setValue('title', '');
+      setValue('body', '');
+      setValue('narratedText', '');
+      setImagePreview(undefined);
+      setImagePayload(undefined);
+      return;
+    }
+
+    setCategory(current.category ?? 'realidade');
+    setDidSeedNarration(Boolean(current.narratedText?.trim()));
     setValue('title', current.title);
     setValue('body', current.body);
+    setValue('narratedText', current.narratedText ?? '');
     setImagePreview(
       current.imageBase64 ? `data:image/jpeg;base64,${current.imageBase64}` : current.imageUri,
     );
@@ -494,6 +541,15 @@ export default function CardEditor() {
   const selectedTone = useMemo(() => categoryTones[category], [category]);
   const saveDisabled = !(live?.title ?? '').trim();
   const fabBottom = 18;
+
+  const toggleNarrationEditor = () => {
+    if (!narrationExpanded && !didSeedNarration) {
+      setValue('narratedText', narrateText(live?.body ?? current?.body ?? '', category));
+      setDidSeedNarration(true);
+    }
+
+    setNarrationExpanded(value => !value);
+  };
 
   const pickImage = async () => {
     try {
@@ -529,17 +585,27 @@ export default function CardEditor() {
   const onSubmit = async (data: FormValues) => {
     if (!data.title?.trim()) return;
 
+    const nextNarratedText = data.narratedText?.trim() ? data.narratedText.trim() : undefined;
+
     if (current) {
+      const bodyChanged = current.body !== (data.body ?? '');
+      const narratedTextChanged = (current.narratedText ?? undefined) !== nextNarratedText;
+
       await updateCard(current.id, {
         title: data.title.trim(),
         body: data.body ?? '',
+        narratedText: nextNarratedText,
+        category,
         imageUri: imagePayload?.uri,
         imageBase64: imagePayload?.base64,
+        audioPath: bodyChanged || narratedTextChanged ? undefined : current.audioPath,
       });
     } else {
       await addCard({
         title: data.title.trim(),
         body: data.body ?? '',
+        narratedText: nextNarratedText,
+        category,
         favorite: false,
         useBgMusic: false,
         imageUri: imagePayload?.uri,
@@ -628,24 +694,24 @@ export default function CardEditor() {
         <View style={styles.fieldGroup}>
           <FieldLabel>Categoria</FieldLabel>
           <View style={styles.categoryGrid}>
-            {(Object.keys(categoryTones) as CategoryLabel[]).map(label => {
-              const tone = categoryTones[label];
-              const selected = category === label;
+            {categoryOptions.map(option => {
+              const selected = category === option.value;
 
               return (
                 <Pressable
-                  key={label}
+                  key={option.value}
                   accessibilityRole="button"
-                  accessibilityLabel={label}
-                  onPress={() => setCategory(label)}
+                  accessibilityState={{ selected }}
+                  accessibilityLabel={option.label}
+                  onPress={() => setCategory(option.value)}
                   style={({ pressed }) => [
                     styles.categoryButton,
                     selected ? styles.categoryButtonSelected : null,
                     pressed ? styles.buttonPressed : null,
                   ]}
                 >
-                  <View style={[styles.categoryButtonBadge, { backgroundColor: tone.bg }]}>
-                    <CategoryIcon tone={tone} />
+                  <View style={[styles.categoryButtonBadge, { backgroundColor: option.bg }]}>
+                    <CategoryIcon tone={option} />
                   </View>
                   <Text
                     style={[
@@ -654,12 +720,58 @@ export default function CardEditor() {
                       selected ? styles.categoryButtonLabelSelected : null,
                     ]}
                   >
-                    {label}
+                    {option.label}
                   </Text>
                 </Pressable>
               );
             })}
           </View>
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <FieldLabel>Narração</FieldLabel>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Personalizar narração"
+            accessibilityState={{ expanded: narrationExpanded }}
+            onPress={toggleNarrationEditor}
+            style={({ pressed }) => [
+              styles.narrationToggle,
+              narrationExpanded ? styles.narrationToggleExpanded : null,
+              pressed ? styles.buttonPressed : null,
+            ]}
+          >
+            <Text style={[styles.narrationToggleText, fontBody]}>Personalizar narração</Text>
+            <Text style={[styles.narrationToggleIndicator, fontTitle]}>
+              {narrationExpanded ? '−' : '+'}
+            </Text>
+          </Pressable>
+
+          {narrationExpanded ? (
+            <>
+              <FieldLabel>Texto narrado (opcional)</FieldLabel>
+              <Controller
+                name="narratedText"
+                control={control}
+                render={({ field: { value, onChange } }) => (
+                  <TextInput
+                    value={value}
+                    onChangeText={onChange}
+                    placeholder="Ajuste como a narração deve soar para você"
+                    placeholderTextColor={hexToRgba(tokens.colors.textMuted, 0.52)}
+                    style={[styles.input, styles.textarea, fontBody]}
+                    multiline
+                    maxLength={MAX_BODY_LENGTH}
+                    textAlignVertical="top"
+                    accessibilityLabel="Texto narrado (opcional)"
+                  />
+                )}
+              />
+              <Text style={[styles.fieldHint, fontBody]}>
+                Se ficar vazio, o app usa automaticamente o conteúdo do cartão.
+              </Text>
+            </>
+          ) : null}
         </View>
 
         <View style={styles.fieldGroup}>
@@ -755,15 +867,14 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   categoryButton: {
-    flex: 1,
-    minWidth: 58,
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
     paddingVertical: 10,
-    paddingHorizontal: 6,
-    borderRadius: 14,
+    paddingHorizontal: 12,
+    borderRadius: 999,
     borderWidth: 1.5,
-    borderColor: 'transparent',
+    borderColor: hexToRgba(tokens.colors.text, 0.08),
     backgroundColor: tokens.colors.bg,
   },
   categoryButtonBadge: {
@@ -775,9 +886,9 @@ const styles = StyleSheet.create({
   },
   categoryButtonLabel: {
     color: tokens.colors.textMuted,
-    fontSize: 9,
+    fontSize: 12,
     fontWeight: '600',
-    lineHeight: 12,
+    lineHeight: 16,
     textAlign: 'center',
   },
   categoryButtonLabelSelected: {
@@ -789,6 +900,7 @@ const styles = StyleSheet.create({
   },
   categoryGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   fab: {
@@ -823,6 +935,11 @@ const styles = StyleSheet.create({
     lineHeight: 14,
     textTransform: 'uppercase',
   },
+  fieldHint: {
+    color: hexToRgba(tokens.colors.textMuted, 0.82),
+    fontSize: 11,
+    lineHeight: 16,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -852,6 +969,32 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     color: tokens.colors.text,
     fontSize: 13,
+    lineHeight: 18,
+  },
+  narrationToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: hexToRgba(tokens.colors.text, 0.12),
+    backgroundColor: tokens.colors.bg,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  narrationToggleExpanded: {
+    borderColor: hexToRgba(tokens.colors.primary, 0.28),
+    backgroundColor: hexToRgba(tokens.colors.secondary, 0.12),
+  },
+  narrationToggleIndicator: {
+    color: tokens.colors.primary,
+    fontSize: 18,
+    lineHeight: 20,
+  },
+  narrationToggleText: {
+    color: tokens.colors.text,
+    fontSize: 13,
+    fontWeight: '600',
     lineHeight: 18,
   },
   pageTitle: {

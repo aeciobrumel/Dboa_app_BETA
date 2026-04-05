@@ -7,6 +7,7 @@ import {
   PanResponder,
   PanResponderGestureState,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
@@ -18,9 +19,11 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import EmergencyButton from '@app/components/EmergencyButton';
 import type { RootStackParamList } from '@app/navigation/RootNavigator';
+import { useCardsStore } from '@app/state/useCardsStore';
 import { tokens } from '@app/theme/tokens';
+import * as audioService from '@app/utils/audioService';
 
-type CrisisStep = 0 | 1 | 2;
+type CrisisStep = 0 | 1 | 2 | 3;
 type BreathPhaseKey = 'inhale' | 'holdFull' | 'exhale' | 'holdEmpty';
 
 type PhoneCallIconProps = {
@@ -61,15 +64,38 @@ function PhoneCallIcon({
   );
 }
 
+function PlayIcon({ color, size = 18 }: { color: string; size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M8 6.6L17.8 12L8 17.4V6.6Z" fill={color} />
+    </Svg>
+  );
+}
+
 export default function CrisisMode() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { t } = useTranslation('app');
   const { width } = useWindowDimensions();
+  const { cards, hydrate } = useCardsStore();
   const [step, setStep] = useState<CrisisStep>(0);
   const [breathPhaseKey, setBreathPhaseKey] = useState<BreathPhaseKey>('inhale');
   const breathScale = useRef(new Animated.Value(0.7)).current;
   const lastInteractionWasSwipe = useRef(false);
-  const totalSteps = 3;
+  const crisisCards = useMemo(
+    () => cards.filter(card => card.category === 'crise'),
+    [cards],
+  );
+  const favoriteCards = useMemo(
+    () => cards.filter(card => Boolean(card.favorite)),
+    [cards],
+  );
+  const supportCards = useMemo(
+    () => (crisisCards.length > 0 ? crisisCards : favoriteCards),
+    [crisisCards, favoriteCards],
+  );
+  const hasSupportCards = supportCards.length > 0;
+  const totalSteps = hasSupportCards ? 4 : 3;
+  const lastStep = totalSteps - 1;
   const progress = (step + 1) / totalSteps;
   const contentWidth = Math.max(width - tokens.spacing(6), 1);
 
@@ -79,6 +105,16 @@ export default function CrisisMode() {
       return () => sub.remove();
     }, []),
   );
+
+  useEffect(() => {
+    void hydrate();
+  }, [hydrate]);
+
+  useEffect(() => {
+    if (step > lastStep) {
+      setStep(lastStep as CrisisStep);
+    }
+  }, [lastStep, step]);
 
   const breathPhases = useMemo(
     () => [
@@ -161,16 +197,16 @@ export default function CrisisMode() {
   };
 
   const goNext = useCallback(() => {
-    if (step === 2) {
+    if (step === lastStep) {
       navigation.popToTop();
       return;
     }
 
-    setStep(previousStep => Math.min((previousStep + 1) as CrisisStep, 2));
-  }, [navigation, step]);
+    setStep(previousStep => Math.min(previousStep + 1, lastStep) as CrisisStep);
+  }, [lastStep, navigation, step]);
 
   const goPrevious = useCallback(() => {
-    setStep(previousStep => Math.max((previousStep - 1) as CrisisStep, 0));
+    setStep(previousStep => Math.max(previousStep - 1, 0) as CrisisStep);
   }, []);
 
   const handleSwipe = useCallback(
@@ -237,12 +273,12 @@ export default function CrisisMode() {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={
-        step === 2
+        step === lastStep
           ? t('crisis.backHome', 'Voltar ao início')
           : t('crisis.exitA11y', 'Sair do modo crise')
       }
       onPress={() => {
-        if (step === 2) {
+        if (step === lastStep) {
           navigation.popToTop();
           return;
         }
@@ -252,7 +288,7 @@ export default function CrisisMode() {
       style={styles.exitButton}
     >
       <Text style={styles.exitText}>
-        {step === 2 ? t('crisis.backHome', 'Voltar ao início') : t('crisis.exit')}
+        {step === lastStep ? t('crisis.backHome', 'Voltar ao início') : t('crisis.exit')}
       </Text>
     </Pressable>
   );
@@ -346,16 +382,57 @@ export default function CrisisMode() {
       );
     }
 
+    if (step === 2) {
+      return (
+        <View style={styles.contentBlock}>
+          <Text style={styles.stepLabel}>{t('crisis.step3Label')}</Text>
+
+          <View style={styles.anchorContent}>
+            <Text style={styles.anchorText}>{t('crisis.anchorText')}</Text>
+
+            <View style={styles.anchorTipCard}>
+              <Text style={styles.anchorTipText}>{t('crisis.anchorTip')}</Text>
+            </View>
+          </View>
+        </View>
+      );
+    }
+
     return (
       <View style={styles.contentBlock}>
-        <Text style={styles.stepLabel}>{t('crisis.step3Label')}</Text>
+        <Text style={styles.stepLabel}>Passo 4</Text>
 
-        <View style={styles.anchorContent}>
-          <Text style={styles.anchorText}>{t('crisis.anchorText')}</Text>
+        <View style={styles.supportContent}>
+          <Text style={styles.supportTitle}>Seus cartões de apoio</Text>
+          <Text style={styles.supportDescription}>
+            Você pode continuar com seus próprios cartões.
+          </Text>
 
-          <View style={styles.anchorTipCard}>
-            <Text style={styles.anchorTipText}>{t('crisis.anchorTip')}</Text>
-          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.supportCardsList}
+          >
+            {supportCards.map(card => (
+              <View key={card.id} style={styles.supportCard}>
+                <Text style={styles.supportCardBody}>{card.body}</Text>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Ouvir cartão ${card.title}`}
+                  onPress={event => {
+                    event.stopPropagation();
+                    void audioService.play(card);
+                  }}
+                  style={({ pressed }) => [
+                    styles.supportPlayButton,
+                    pressed ? styles.supportPlayButtonPressed : null,
+                  ]}
+                >
+                  <PlayIcon color={tokens.colors.bg} size={16} />
+                </Pressable>
+              </View>
+            ))}
+          </ScrollView>
         </View>
       </View>
     );
@@ -563,6 +640,59 @@ const styles = StyleSheet.create({
   navigationHint: {
     color: tokens.colors.textMuted,
     fontSize: tokens.typography.sizes.label,
+    textAlign: 'center',
+  },
+  supportCard: {
+    width: 240,
+    minHeight: 170,
+    borderRadius: 18,
+    backgroundColor: tokens.colors.bg,
+    borderWidth: 1,
+    borderColor: tokens.colors.surfaceBlue,
+    padding: tokens.spacing(2),
+    justifyContent: 'space-between',
+    gap: tokens.spacing(2),
+  },
+  supportCardBody: {
+    color: tokens.colors.text,
+    fontSize: 16,
+    lineHeight: 16 * tokens.typography.lineHeight.normal,
+    flexShrink: 1,
+  },
+  supportCardsList: {
+    gap: tokens.spacing(1.5),
+    paddingHorizontal: tokens.spacing(0.25),
+  },
+  supportContent: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    gap: tokens.spacing(2),
+  },
+  supportDescription: {
+    color: tokens.colors.textMuted,
+    fontSize: 14,
+    lineHeight: 14 * tokens.typography.lineHeight.normal,
+    textAlign: 'center',
+    paddingHorizontal: tokens.spacing(1),
+  },
+  supportPlayButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 999,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-end',
+    backgroundColor: tokens.colors.primary,
+  },
+  supportPlayButtonPressed: {
+    backgroundColor: tokens.colors.primaryDark,
+  },
+  supportTitle: {
+    color: tokens.colors.primary,
+    fontSize: 24,
+    lineHeight: 24 * 1.2,
+    fontFamily: tokens.typography.weights.bold,
     textAlign: 'center',
   },
   stepLabel: {
