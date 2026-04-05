@@ -1,23 +1,29 @@
-// Store de cartões personalizados (CRUD) com persistência local
+// Store de cartões personalizados (CRUD) com persistência validada
 // Mantém UX simples para não interferir no fluxo de crise
-import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { randomUUID } from 'expo-crypto';
+import { z } from 'zod';
+import { create } from 'zustand';
+import { createJSONStorage, persist, type StateStorage } from 'zustand/middleware';
 
 export type Card = {
   id: string;
   title: string;
   body: string;
-  imageUri?: string; // caminho/URI do arquivo (mobile)
-  imageBase64?: string; // fallback para Web (data URI)
+  imageUri?: string;
+  imageBase64?: string;
   favorite?: boolean;
-  color?: string; // opcional para futuro tema por cartão
-  useBgMusic?: boolean; // se tocar trilha ao abrir
+  color?: string;
+  useBgMusic?: boolean;
   createdAt: number;
   updatedAt: number;
 };
 
-type CardsState = {
+type CardsPersistedState = {
   cards: Card[];
+};
+
+type CardsState = CardsPersistedState & {
   hydrated: boolean;
   hydrate: () => Promise<void>;
   addCard: (c: Omit<Card, 'id' | 'createdAt' | 'updatedAt'>) => Promise<string>;
@@ -29,90 +35,152 @@ type CardsState = {
 };
 
 const STORAGE_KEY = 'user_cards_v1';
+const STORAGE_VERSION = 1;
 
-export const useCardsStore = create<CardsState>((set, get) => ({
-  cards: [],
-  hydrated: false,
-  hydrate: async () => {
-    if (get().hydrated) return;
+const cardSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  body: z.string(),
+  imageUri: z.string().optional(),
+  imageBase64: z.string().optional(),
+  favorite: z.boolean().optional(),
+  color: z.string().optional(),
+  useBgMusic: z.boolean().optional(),
+  createdAt: z.number(),
+  updatedAt: z.number()
+});
+
+const legacyCardsSchema = z.array(cardSchema);
+const persistedCardsSchema = z.object({
+  cards: z.array(cardSchema)
+});
+
+function createDefaultCards(): Card[] {
+  const now = Date.now();
+  return [
+    { id: 'p1', title: 'Respire com calma', body: 'Inspire pelo nariz, expire pela boca. Sinta o ar.', createdAt: now, updatedAt: now, favorite: true },
+    { id: 'p2', title: 'Você está seguro', body: 'Observe 5 coisas que vê ao redor.', createdAt: now, updatedAt: now },
+    { id: 'p3', title: 'Tudo passa', body: 'As sensações mudam. Dê tempo a si mesmo.', createdAt: now, updatedAt: now },
+    { id: 'p4', title: 'Eu consigo', body: 'Lembre um momento em que superou algo difícil.', createdAt: now, updatedAt: now },
+    { id: 'p5', title: 'Âncora no presente', body: 'Note 4 toques, 3 sons, 2 cheiros, 1 sabor.', createdAt: now, updatedAt: now },
+  ];
+}
+
+const defaultPersistedState = (): CardsPersistedState => ({
+  cards: createDefaultCards()
+});
+
+const serializePersistedState = (state: CardsPersistedState) =>
+  JSON.stringify({ state, version: STORAGE_VERSION });
+
+const cardsStateStorage: StateStorage = {
+  getItem: async name => {
+    const raw = await AsyncStorage.getItem(name);
+    if (!raw) return null;
+
     try {
-      const raw = await AsyncStorage.getItem(STORAGE_KEY);
-      const seedKey = 'user_cards_seeded_v1';
-      const seedFlag = await AsyncStorage.getItem(seedKey);
-      if (raw) {
-        const parsed: Card[] = JSON.parse(raw);
-        if (parsed.length === 0 && !seedFlag) {
-          const now = Date.now();
-          const defaults: Card[] = [
-            { id: 'p1', title: 'Respire com calma', body: 'Inspire pelo nariz, expire pela boca. Sinta o ar.', createdAt: now, updatedAt: now, favorite: true },
-            { id: 'p2', title: 'Você está seguro', body: 'Observe 5 coisas que vê ao redor.', createdAt: now, updatedAt: now },
-            { id: 'p3', title: 'Tudo passa', body: 'As sensações mudam. Dê tempo a si mesmo.', createdAt: now, updatedAt: now },
-            { id: 'p4', title: 'Eu consigo', body: 'Lembre um momento em que superou algo difícil.', createdAt: now, updatedAt: now },
-            { id: 'p5', title: 'Âncora no presente', body: 'Note 4 toques, 3 sons, 2 cheiros, 1 sabor.', createdAt: now, updatedAt: now }
-          ];
-          set({ cards: defaults, hydrated: true });
-          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
-          await AsyncStorage.setItem(seedKey, '1');
-        } else {
-          set({ cards: parsed, hydrated: true });
+      const parsed = JSON.parse(raw) as unknown;
+
+      if (parsed && typeof parsed === 'object' && 'state' in parsed) {
+        const candidate = (parsed as { state: unknown }).state;
+        const result = persistedCardsSchema.safeParse(candidate);
+
+        if (result.success) {
+          return serializePersistedState(result.data);
         }
-      } else {
-        // Primeira execução sem storage: semeia defaults e marca flag
-        const now = Date.now();
-        const defaults: Card[] = [
-          { id: 'p1', title: 'Respire com calma', body: 'Inspire pelo nariz, expire pela boca. Sinta o ar.', createdAt: now, updatedAt: now, favorite: true },
-          { id: 'p2', title: 'Você está seguro', body: 'Observe 5 coisas que vê ao redor.', createdAt: now, updatedAt: now },
-          { id: 'p3', title: 'Tudo passa', body: 'As sensações mudam. Dê tempo a si mesmo.', createdAt: now, updatedAt: now },
-          { id: 'p4', title: 'Eu consigo', body: 'Lembre um momento em que superou algo difícil.', createdAt: now, updatedAt: now },
-          { id: 'p5', title: 'Âncora no presente', body: 'Note 4 toques, 3 sons, 2 cheiros, 1 sabor.', createdAt: now, updatedAt: now }
-        ];
-        set({ cards: defaults, hydrated: true });
-        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
-        await AsyncStorage.setItem(seedKey, '1');
+
+        console.warn('[Cards] Persisted state inválido; restaurando padrão.');
+        return serializePersistedState(defaultPersistedState());
       }
-    } catch {
-      set({ hydrated: true });
+
+      const legacy = legacyCardsSchema.safeParse(parsed);
+      if (legacy.success) {
+        return serializePersistedState({ cards: legacy.data });
+      }
+
+      console.warn('[Cards] JSON legado inválido; restaurando padrão.');
+    } catch (error) {
+      console.warn('[Cards] Falha ao validar JSON salvo:', error);
     }
+
+    return serializePersistedState(defaultPersistedState());
   },
-  addCard: async c => {
-    const id = Math.random().toString(36).slice(2);
-    const now = Date.now();
-    const item: Card = { id, createdAt: now, updatedAt: now, ...c } as Card;
-    const cards = [item, ...get().cards];
-    set({ cards });
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-    return id;
-  },
-  updateCard: async (id, patch) => {
-    const cards = get().cards.map(c => (c.id === id ? { ...c, ...patch, updatedAt: Date.now() } : c));
-    set({ cards });
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-  },
-  removeCard: async id => {
-    const cards = get().cards.filter(c => c.id !== id);
-    set({ cards });
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-  },
-  toggleFavorite: async id => {
-    const cards = get().cards.map(c => (c.id === id ? { ...c, favorite: !c.favorite } : c));
-    set({ cards });
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
-  },
-  reorder: async (next) => {
-    set({ cards: next });
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  },
-  restoreDefaults: async () => {
-    const now = Date.now();
-    const defaults: Card[] = [
-      { id: 'p1', title: 'Respire com calma', body: 'Inspire pelo nariz, expire pela boca. Sinta o ar.', createdAt: now, updatedAt: now, favorite: true },
-      { id: 'p2', title: 'Você está seguro', body: 'Observe 5 coisas que vê ao redor.', createdAt: now, updatedAt: now },
-      { id: 'p3', title: 'Tudo passa', body: 'As sensações mudam. Dê tempo a si mesmo.', createdAt: now, updatedAt: now },
-      { id: 'p4', title: 'Eu consigo', body: 'Lembre um momento em que superou algo difícil.', createdAt: now, updatedAt: now },
-      { id: 'p5', title: 'Âncora no presente', body: 'Note 4 toques, 3 sons, 2 cheiros, 1 sabor.', createdAt: now, updatedAt: now }
-    ];
-    set({ cards: defaults, hydrated: true });
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
-    await AsyncStorage.setItem('user_cards_seeded_v1', '1');
+  setItem: (name, value) => AsyncStorage.setItem(name, value),
+  removeItem: name => AsyncStorage.removeItem(name)
+};
+
+const cardsStorage = createJSONStorage<CardsPersistedState>(() => cardsStateStorage);
+
+let rehydrateCardsStore: () => Promise<void> = async () => {};
+
+export const useCardsStore = create<CardsState>()(
+  persist(
+    (set, get) => ({
+      ...defaultPersistedState(),
+      hydrated: false,
+      hydrate: () => rehydrateCardsStore(),
+      addCard: async c => {
+        const now = Date.now();
+        const item: Card = {
+          id: randomUUID(),
+          createdAt: now,
+          updatedAt: now,
+          ...c
+        };
+
+        set(state => ({ cards: [item, ...state.cards] }));
+        return item.id;
+      },
+      updateCard: async (id, patch) => {
+        set(state => ({
+          cards: state.cards.map(card =>
+            card.id === id ? { ...card, ...patch, updatedAt: Date.now() } : card
+          )
+        }));
+      },
+      removeCard: async id => {
+        set(state => ({
+          cards: state.cards.filter(card => card.id !== id)
+        }));
+      },
+      toggleFavorite: async id => {
+        set(state => ({
+          cards: state.cards.map(card =>
+            card.id === id
+              ? { ...card, favorite: !card.favorite, updatedAt: Date.now() }
+              : card
+          )
+        }));
+      },
+      reorder: async next => {
+        set({ cards: next });
+      },
+      restoreDefaults: async () => {
+        set({ cards: createDefaultCards() });
+      }
+    }),
+    {
+      name: STORAGE_KEY,
+      version: STORAGE_VERSION,
+      storage: cardsStorage,
+      partialize: state => ({ cards: state.cards }),
+      onRehydrateStorage: () => (_, error) => {
+        if (error) {
+          console.warn('[Cards] Falha ao hidratar cartões:', error);
+        }
+        useCardsStore.setState({ hydrated: true });
+      }
+    }
+  )
+);
+
+rehydrateCardsStore = async () => {
+  if (useCardsStore.persist.hasHydrated()) {
+    if (!useCardsStore.getState().hydrated) {
+      useCardsStore.setState({ hydrated: true });
+    }
+    return;
   }
-}));
+
+  await useCardsStore.persist.rehydrate();
+};

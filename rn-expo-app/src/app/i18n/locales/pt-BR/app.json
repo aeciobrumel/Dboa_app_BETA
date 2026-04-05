@@ -1,20 +1,135 @@
 {
   "home": {
     "accessibilityLabel": "Tela inicial",
+    "goodMorning": "Bom dia",
+    "goodAfternoon": "Boa tarde",
+    "goodEvening": "Boa noite",
+    "greetingQuestion": "Como você está agora?",
+    "greetingSub": "Seus cartões estão prontos quando precisar.",
+    "supportLine": "tudo bem vai passar",
+    "mascotA11y": "Mascote D'Boa - sol sorridente",
+    "crisisButton": "Preciso de ajuda agora",
+    "crisisButtonHint": "Abre o modo de ajuda imediata",
+    "startButton": "Começar agora",
+    "startButtonHint": "Inicia o protocolo de ajuda",
+    "crisisNow": "Preciso de ajuda agora",
+    "crisisNowA11y": "Abrir modo crise imediatamente",
     "startNow": "Começar agora",
     "startNowA11y": "Iniciar protocolo de ajuda"
   },
   "a11y": {
-    "startingSession": "Iniciando sessão guiada"
+    "startingSession": "Iniciando sessão guiada",
+    "startingCrisisMode": "Abrindo modo crise"
   },
   "session": {
-    "endTitle": "Sessão encerrada. Você está no controle."
+    "endTitle": "Sessão encerrada. Você está no controle.",
+    "breath": {
+      "nextA11y": "Continuar para o próximo exercício"
+    }
   },
   "common": {
+    "continue": "Continuar",
+    "exit": "Sair",
     "next": "Próximo",
     "end": "Encerrar",
     "finish": "Concluir",
-    "goHome": "Voltar ao início"
+    "goHome": "Voltar ao início",
+    "restart": "Voltar ao início"
+  },
+  "tabs": {
+    "home": "Início",
+    "cards": "Cartões",
+    "settings": "Configurações"
+  },
+  "crisis": {
+    "step1Label": "Ajuda imediata",
+    "disclaimer": "Este app é uma ferramenta de apoio emocional. Não substitui atendimento médico.",
+    "cvvLabel": "CVV — Centro de Valorização da Vida",
+    "samuLabel": "SAMU — Emergência médica",
+    "cvvA11yLabel": "Ligar para o CVV: 188",
+    "samuA11yLabel": "Ligar para o SAMU: 192",
+    "cvvCallHint": "Toque para iniciar a ligação de apoio emocional",
+    "samuCallHint": "Toque para iniciar a ligação de emergência médica",
+    "disclaimerSub": "Se você ou alguém está em risco imediato, ligue agora.",
+    "continue": "Continuar",
+    "step2Label": "Respiração",
+    "breathSub": "Siga o ritmo da bola",
+    "breathTip": "Se estiver difícil, foque apenas em soltar o ar um pouco mais devagar.",
+    "next": "Próximo",
+    "step3Label": "Âncora",
+    "anchorText": "Você está seguro. Isso vai passar.",
+    "anchorTip": "Coloque a mão no peito ou segure algo firme enquanto lê a frase.",
+    "backHome": "Voltar ao início",
+    "exit": "Sair",
+    "breath": {
+      "inhale": "Inspira",
+      "hold": "Segura",
+      "exhale": "Expira"
+    },
+    "exitA11y": "Sair do modo crise"
+  },
+  "grounding": {
+    "title": "Técnica 5-4-3-2-1",
+    "nextA11y": "Avançar para a próxima etapa do grounding",
+    "endA11y": "Encerrar sessão agora",
+    "steps": {
+      "see": {
+        "sense": "coisas que você VÊ",
+        "instruction": "Olhe ao redor e nomeie cinco coisas que você vê."
+      },
+      "touch": {
+        "sense": "coisas que você TOCA",
+        "instruction": "Perceba quatro coisas que você pode tocar agora."
+      },
+      "hear": {
+        "sense": "coisas que você OUVE",
+        "instruction": "Escute com calma e identifique três sons ao seu redor."
+      },
+      "smell": {
+        "sense": "coisas que você CHEIRA",
+        "instruction": "Note dois cheiros ou sensações no ar."
+      },
+      "taste": {
+        "sense": "coisas que você SABOREIA",
+        "instruction": "Perceba um gosto presente na boca ou na respiração."
+      }
+    }
+  },
+  "affirmations": {
+    "title": "Afirmações",
+    "counter": "{{current}} de {{total}}",
+    "next": "Próxima",
+    "nextA11y": "Avançar para a próxima afirmação positiva",
+    "items": [
+      "Você é mais forte do que imagina.",
+      "Isso vai passar.",
+      "Você está seguro agora.",
+      "Cada respiração te traz mais calma.",
+      "Você merece cuidado e compaixão.",
+      "Você pode seguir um passo de cada vez."
+    ]
+  },
+  "sessionEnd": {
+    "title": "Você fez algo importante por si mesmo. Isso exige coragem.",
+    "question": "Como você está agora?",
+    "goHomeA11y": "Encerrar sessão e voltar ao início",
+    "moodOptionA11y": "{{label}}, opção {{rating}}",
+    "moods": {
+      "labels": ["Muito mal", "Mal", "Neutro", "Melhor", "Bem"]
+    }
+  },
+  "emergency": {
+    "buttonLabel": "Emergência",
+    "title": "Ajuda imediata",
+    "description": "Escolha uma opção de apoio agora.",
+    "cvv": "CVV - 188",
+    "samu": "SAMU - 192",
+    "callCvv": "Ligar para o CVV 188",
+    "callSamu": "Ligar para o SAMU 192",
+    "trustedContactWithName": "{{name}} - pedir apoio",
+    "callTrustedContact": "Falar com {{name}}",
+    "noTrustedContact": "Sem contato de confiança cadastrado.",
+    "trustedContactMessage": "Estou passando por um momento difícil e preciso de companhia.",
+    "close": "Fechar"
   }
 }
-

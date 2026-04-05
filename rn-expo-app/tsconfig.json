@@ -20,7 +20,7 @@
       "@app/*": ["src/app/*"]
     }
   },
-  "include": ["src", "__tests__"],
+  "include": ["src", "__tests__", "declarations.d.ts", "nativewind-env.d.ts"],
   "exclude": ["node_modules"],
   "extends": "./node_modules/expo/tsconfig.base.json"
 }

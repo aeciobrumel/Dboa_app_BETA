@@ -2,6 +2,14 @@
   "welcome": "¡Bienvenida(o)! Ajustemos algunas preferencias.",
   "enableHaptics": "Activar vibración (haptics)",
   "continue": "Continuar",
-  "disclaimer": "Esta app no sustituye atención médica. En emergencia, busca ayuda local.",
-  "legalLink": "Ver Política de Privacidad y Términos"
+  "legalLink": "Ver Política de Privacidad y Términos",
+  "disclaimerSupportTool": "Esta app es una herramienta de apoyo emocional. No sustituye atención médica o psicológica.",
+  "disclaimerEmergencyTitle": "En situación de emergencia:",
+  "disclaimerImmediateRisk": "Si tú o alguien está en riesgo inmediato, llama ahora.",
+  "cvvLabel": "CVV",
+  "cvvNumber": "188",
+  "cvvAccessibility": "Llamar al CVV 188",
+  "samuLabel": "SAMU",
+  "samuNumber": "192",
+  "samuAccessibility": "Llamar al SAMU 192"
 }

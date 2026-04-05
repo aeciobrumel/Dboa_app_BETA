@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   title: { color: tokens.colors.text, fontSize: 22, fontFamily: 'Lemondrop-Bold' },
   label: { color: tokens.colors.text, fontSize: 14 },
   input: {
-    backgroundColor: '#F4F6FA',
+    backgroundColor: tokens.colors.inputBg,
     color: tokens.colors.text,
     borderWidth: 1,
     borderColor: tokens.colors.secondary,

@@ -4,25 +4,49 @@
   "bgMusic": "Música de fondo",
   "narration": "Narración",
   "haptics": "Vibración al tocar",
-  "telemetry": "Participar anónimamente en métricas (opt-in)"
-  ,"cardsSection": "Tarjetas"
-  ,"restoreCards": "Restablecer tarjetas predeterminadas"
-  ,"restoreConfirmTitle": "¿Restablecer tarjetas?"
-  ,"restoreConfirmBody": "Esto reemplazará tus tarjetas actuales por las predeterminadas."
-  ,"restoreConfirmOk": "Restablecer"
-  ,"restoreDoneTitle": "Listo"
-  ,"restoreDoneBody": "Tarjetas predeterminadas restauradas."
-  ,"voiceTitle": "Voz de la narración"
-  ,"voiceAuto": "Auto"
-  ,"voiceFemale": "Femenina"
-  ,"voiceMale": "Masculina"
-  ,"rate": "Velocidad"
-  ,"pitch": "Tono"
-  ,"voicePreview": "Previsualizar voz"
-  ,"voicePreviewText": "Hola, esta es la voz que te guiará."
-  ,"chooseMusic": "Elegir música de fondo"
-  ,"resetMusic": "Usar música predeterminada"
-  ,"customMusic": "Música personalizada seleccionada"
-  ,"defaultMusic": "Usando música predeterminada"
-  ,"voiceWarnNotAvailable": "Aviso: la voz elegida puede no estar disponible en este dispositivo. Usaremos la alternativa disponible."
+  "telemetry": "Participar anónimamente en métricas (opt-in)",
+  "cardsSection": "Tarjetas",
+  "restoreCards": "Restablecer tarjetas predeterminadas",
+  "restoreConfirmTitle": "¿Restablecer tarjetas?",
+  "restoreConfirmBody": "Esto reemplazará tus tarjetas actuales por las predeterminadas.",
+  "restoreConfirmOk": "Restablecer",
+  "restoreDoneTitle": "Listo",
+  "restoreDoneBody": "Tarjetas predeterminadas restauradas.",
+  "voiceTitle": "Voz de la narración",
+  "voiceAuto": "Auto",
+  "voiceFemale": "Femenina",
+  "voiceMale": "Masculina",
+  "rate": "Velocidad",
+  "pitch": "Tono",
+  "voicePreview": "Previsualizar voz",
+  "voicePreviewText": "Hola, esta es la voz que te guiará.",
+  "chooseMusic": "Elegir música de fondo",
+  "resetMusic": "Usar música predeterminada",
+  "customMusic": "Música personalizada seleccionada",
+  "defaultMusic": "Usando música predeterminada",
+  "voiceWarnNotAvailable": "Aviso: la voz elegida puede no estar disponible en este dispositivo. Usaremos la alternativa disponible.",
+  "trustedContactsTitle": "Contacto de confianza",
+  "trustedContactsDescription": "Este contacto aparece en el botón de emergencia para pedir apoyo rápidamente.",
+  "trustedContactName": "Nombre",
+  "trustedContactNamePlaceholder": "Ej.: Ana",
+  "trustedContactPhone": "Teléfono",
+  "trustedContactPhonePlaceholder": "Ej.: +55 11 99999-9999",
+  "trustedContactChannel": "Canal preferido",
+  "trustedContactWhatsapp": "WhatsApp",
+  "trustedContactSms": "SMS",
+  "trustedContactAdd": "Agregar contacto",
+  "trustedContactUpdate": "Guardar cambios",
+  "trustedContactCancelEdit": "Cancelar edición",
+  "trustedContactCounter_one": "{{count}} de 3 contactos registrado",
+  "trustedContactCounter_other": "{{count}} de 3 contactos registrados",
+  "trustedContactEmpty": "Todavía no hay contactos registrados. Agrega al menos uno para que aparezca en la ayuda inmediata.",
+  "trustedContactEdit": "Editar",
+  "trustedContactRemove": "Eliminar",
+  "trustedContactRemoveTitle": "¿Eliminar contacto?",
+  "trustedContactRemoveBody": "Esto eliminará a {{name}} de tu lista de apoyo.",
+  "trustedContactRemoveConfirm": "Eliminar",
+  "trustedContactValidationTitle": "Completa los campos",
+  "trustedContactValidationBody": "Ingresa el nombre y el teléfono del contacto de confianza.",
+  "trustedContactLimitTitle": "Límite alcanzado",
+  "trustedContactLimitBody": "Puedes registrar hasta 3 contactos de confianza."
 }

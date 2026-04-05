@@ -1,96 +1,150 @@
 // Card de Respiração guiada (Box Breathing) para uso dentro da sessão
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Text, Animated, AccessibilityInfo } from 'react-native';
+import React, { useCallback, useEffect, useRef } from 'react';
+import { View, StyleSheet, Text, Animated } from 'react-native';
 import { tokens } from '@app/theme/tokens';
-import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
+import { useBoxBreath, type BoxBreathPhase } from '@app/hooks/useBoxBreath';
 
 type Props = {
   onDone?: () => void;
   cycles?: number; // padrão 4
+  minimal?: boolean;
+  phaseLabels?: Partial<Record<'inspire' | 'expire' | 'hold', string>>;
 };
 
-export default function BreathCard({ onDone, cycles = 4 }: Props) {
+export default function BreathCard({ onDone, cycles = 4, minimal = false, phaseLabels }: Props) {
   const { t } = useTranslation('cards');
   const scale = useRef(new Animated.Value(1)).current;
-  const [cycle, setCycle] = useState(0);
-  const [step, setStep] = useState<'inspire' | 'segura' | 'expire' | 'segura2' | 'done'>('inspire');
-  const [running, setRunning] = useState(true);
+  const { cycle, isRunning, phase, start, stop } = useBoxBreath(cycles);
+  const defaultPhaseLabels = {
+    inspire: phaseLabels?.inspire ?? t('breath.phase.inspire', 'Inspirar'),
+    expire: phaseLabels?.expire ?? t('breath.phase.expire', 'Expirar'),
+    hold: phaseLabels?.hold ?? t('breath.phase.hold', 'Segurar'),
+  };
 
-  const animateTo = useCallback((toValue: number, duration: number) =>
-    new Promise<void>((resolve) => {
-      Animated.timing(scale, { toValue, duration, useNativeDriver: true }).start(() => resolve());
-    }), [scale]);
-
-  const boxBreath = useCallback(async () => {
-    try {
-      for (let i = 1; i <= cycles; i++) {
-        setCycle(i);
-        // Inspirar 4s (bola cresce)
-        setStep('inspire');
-        AccessibilityInfo.announceForAccessibility(`Ciclo ${i}. Inspirar`);
-        Haptics.selectionAsync();
-        await animateTo(1.4, 4000);
-
-        // Segurar 4s
-        setStep('segura');
-        AccessibilityInfo.announceForAccessibility('Segurar');
-        Haptics.selectionAsync();
-        await new Promise((r) => setTimeout(r, 4000));
-
-        // Expirar 4s (bola diminui)
-        setStep('expire');
-        AccessibilityInfo.announceForAccessibility('Expirar');
-        Haptics.selectionAsync();
-        await animateTo(0.6, 4000);
-
-        // Segurar 4s
-        setStep('segura2');
-        AccessibilityInfo.announceForAccessibility('Segurar');
-        Haptics.selectionAsync();
-        await new Promise((r) => setTimeout(r, 4000));
-      }
-      setStep('done');
-      setRunning(false);
-      AccessibilityInfo.announceForAccessibility('Exercício concluído');
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      onDone?.();
-    } catch {
-      setStep('done');
-      setRunning(false);
-      onDone?.();
-    }
-  }, [animateTo, cycles, onDone]);
+  const animateTo = useCallback(
+    (toValue: number, duration: number) =>
+      new Promise<void>(resolve => {
+        Animated.timing(scale, { toValue, duration, useNativeDriver: true }).start(() => resolve());
+      }),
+    [scale]
+  );
 
   useEffect(() => {
-    let mounted = true;
-    if (mounted) boxBreath();
-    return () => { mounted = false; };
-  }, [boxBreath]);
+    start();
+    return stop;
+  }, [start, stop]);
+
+  useEffect(() => {
+    if (phase === 'inspire') {
+      animateTo(1.4, 4000);
+      return;
+    }
+
+    if (phase === 'expire') {
+      animateTo(0.6, 4000);
+    }
+  }, [animateTo, phase]);
+
+  useEffect(() => {
+    if (!isRunning && phase === 'done') {
+      onDone?.();
+    }
+  }, [isRunning, onDone, phase]);
+
+  const getPhaseLabel = (currentPhase: BoxBreathPhase) => {
+    if (minimal) {
+      return currentPhase === 'expire' || currentPhase === 'segura2'
+        ? defaultPhaseLabels.expire
+        : defaultPhaseLabels.inspire;
+    }
+
+    if (currentPhase === 'inspire') {
+      return defaultPhaseLabels.inspire;
+    }
+
+    if (currentPhase === 'expire') {
+      return defaultPhaseLabels.expire;
+    }
+
+    return defaultPhaseLabels.hold;
+  };
+
+  const currentPhaseLabel = getPhaseLabel(phase);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{t('breath.title')}</Text>
-      <Text style={styles.subtitle}>
-        {running ? `Ciclo ${cycle} de ${cycles} — ${step === 'inspire' ? 'Inspirar' : step === 'expire' ? 'Expirar' : 'Segurar'}` : 'Concluído'}
+    <View style={[styles.container, minimal ? styles.minimalContainer : null]}>
+      {!minimal ? <Text style={styles.title}>{t('breath.title')}</Text> : null}
+      <Text style={[styles.subtitle, minimal ? styles.minimalSubtitle : null]}>
+        {isRunning
+          ? minimal
+            ? currentPhaseLabel
+            : t('breath.status', {
+                current: cycle,
+                total: cycles,
+                phase: currentPhaseLabel,
+                defaultValue: 'Ciclo {{current}} de {{total}} - {{phase}}',
+              })
+          : t('breath.completed', 'Concluído')}
       </Text>
       <View style={styles.ballContainer}>
         <Animated.View
           accessibilityRole="image"
-          accessibilityLabel={`Bola de respiração, estado: ${step}`}
+          accessibilityLabel={t('breath.ballA11y', {
+            phase: currentPhaseLabel,
+            defaultValue: 'Bola de respiração, estado: {{phase}}',
+          })}
           style={[styles.ball, { transform: [{ scale }] }]}
         />
       </View>
-      {!running && <Text style={styles.hint}>Toque em Próximo para continuar</Text>}
+      {!minimal && !isRunning ? (
+        <Text style={styles.hint}>
+          {t('breath.nextHint', 'Deslize ou toque na tela para continuar')}
+        </Text>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { alignItems: 'center', gap: 8 },
-  title: { color: tokens.colors.text, fontSize: 22, textAlign: 'center', fontFamily: 'Lemondrop-Bold' },
-  subtitle: { color: tokens.colors.textMuted, fontSize: 14, textAlign: 'center' },
-  ballContainer: { width: 200, height: 200, alignItems: 'center', justifyContent: 'center' },
-  ball: { width: 110, height: 110, borderRadius: 110, backgroundColor: '#36507D' },
-  hint: { color: tokens.colors.textMuted }
+  ball: {
+    width: 110,
+    height: 110,
+    borderRadius: 110,
+    backgroundColor: tokens.colors.primary,
+  },
+  ballContainer: {
+    width: 200,
+    height: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  container: {
+    alignItems: 'center',
+    gap: tokens.spacing(1),
+  },
+  hint: {
+    color: tokens.colors.textMuted,
+    fontSize: tokens.typography.sizes.body,
+    textAlign: 'center',
+  },
+  minimalContainer: {
+    gap: tokens.spacing(2),
+  },
+  minimalSubtitle: {
+    color: tokens.colors.text,
+    fontSize: tokens.typography.sizes.h1,
+    fontFamily: tokens.typography.weights.bold,
+  },
+  subtitle: {
+    color: tokens.colors.textMuted,
+    fontSize: tokens.typography.sizes.label,
+    textAlign: 'center',
+  },
+  title: {
+    color: tokens.colors.text,
+    fontSize: tokens.typography.sizes.h2,
+    textAlign: 'center',
+    fontFamily: tokens.typography.weights.bold,
+  },
 });

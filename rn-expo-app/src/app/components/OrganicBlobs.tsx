@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useEffect } from 'react';
 import Svg, { Path } from 'react-native-svg';
 import { Animated, Easing, StyleSheet } from 'react-native';
 import { tokens } from '@app/theme/tokens';
+import { rng, withOpacity } from '@app/utils/decorative';
 
 type Props = {
   seed: string | number;
@@ -16,21 +17,6 @@ type Props = {
   safeSides?: number; // left/right margins to keep clear
 };
 
-// RNG determinístico
-const rng = (seedNum: number) => {
-  let s = seedNum % 2147483647;
-  if (s <= 0) s += 2147483646;
-  return () => (s = (s * 16807) % 2147483647) / 2147483647;
-};
-
-function withOpacity(hex: string, alpha: number) {
-  const h = hex.replace('#', '');
-  const bigint = parseInt(h, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
 
 function blobPath(cx: number, cy: number, r: number, rand: () => number, variance: number, points = 8) {
   const pts: { x: number; y: number; a: number; rad: number }[] = [];

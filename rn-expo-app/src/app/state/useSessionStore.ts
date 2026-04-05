@@ -12,9 +12,11 @@ type SessionState = {
   active: boolean;
   step: 'Breath' | 'Grounding54321' | 'Affirmations' | 'SessionEnd';
   cards: Card[];
+  moodRating?: number;
   start: () => void;
   next: () => void;
   end: () => void;
+  setMoodRating: (rating?: number) => void;
   addCard: (c: Omit<Card, 'id' | 'createdAt'>) => void;
   removeCard: (id: string) => void;
   resetCards: () => void;
@@ -64,7 +66,8 @@ export const useSessionStore = create<SessionState>(set => ({
   active: false,
   step: 'Breath',
   cards: initialCards,
-  start: () => set({ active: true, step: 'Breath' }),
+  moodRating: undefined,
+  start: () => set({ active: true, step: 'Breath', moodRating: undefined }),
   next: () =>
     set(state => {
       const order = ['Breath', 'Grounding54321', 'Affirmations', 'SessionEnd'] as const;
@@ -72,6 +75,7 @@ export const useSessionStore = create<SessionState>(set => ({
       return { step: order[Math.min(idx + 1, order.length - 1)] } as any;
     }),
   end: () => set({ active: false, step: 'SessionEnd' }),
+  setMoodRating: moodRating => set({ moodRating }),
   addCard: (c) =>
     set((s) => ({
       cards: [
@@ -92,4 +96,3 @@ export const useSessionStore = create<SessionState>(set => ({
       return { cards: arr };
     })
 }));
-

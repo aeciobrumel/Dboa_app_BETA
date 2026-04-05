@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import { tokens } from '@app/theme/tokens';
+import { rng, withOpacity } from '@app/utils/decorative';
 
 type Props = {
   seed: string | number;
@@ -12,29 +13,14 @@ type Props = {
 
 type Wave = {
   color: string;
-  left: string; // percent
-  top: string; // percent
+  left: `${number}%`;
+  top: `${number}%`;
   w: number; // px
   h: number; // px
   br: number; // border radius
   rot: number; // deg
 };
 
-// Simple deterministic RNG
-const rng = (seedNum: number) => {
-  let s = seedNum % 2147483647;
-  if (s <= 0) s += 2147483646;
-  return () => (s = (s * 16807) % 2147483647) / 2147483647;
-};
-
-function withOpacity(hex: string, alpha: number) {
-  const h = hex.replace('#', '');
-  const bigint = parseInt(h, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
 
 export default function OrganicWaves({ seed, count = 4, opacity = 0.1, animate = true, style }: Props) {
   const s = typeof seed === 'number' ? seed : Array.from(String(seed)).reduce((a, c) => a + c.charCodeAt(0), 0);
@@ -49,8 +35,8 @@ export default function OrganicWaves({ seed, count = 4, opacity = 0.1, animate =
       const w = base * aspect;
       const h = base * (0.6 + rand() * 0.6);
       const br = Math.min(w, h) * (0.45 + rand() * 0.2);
-      const left = `${5 + rand() * 90}%`;
-      const top = `${5 + rand() * 90}%`;
+      const left = `${5 + rand() * 90}%` as `${number}%`;
+      const top = `${5 + rand() * 90}%` as `${number}%`;
       const rot = (rand() - 0.5) * 30; // -15..15
       const color = palette[i % palette.length];
       arr.push({ color, left, top, w, h, br, rot });
@@ -120,4 +106,3 @@ export default function OrganicWaves({ seed, count = 4, opacity = 0.1, animate =
 const styles = StyleSheet.create({
   wrap: { ...StyleSheet.absoluteFillObject, zIndex: 0 }
 });
-

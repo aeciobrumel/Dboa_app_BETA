@@ -1,7 +1,17 @@
 {
   "breath": {
     "title": "Respiração guiada",
-    "subtitle": "Inspire 4s, segure 4s, expire 6s"
+    "subtitle": "Inspire 4s, segure 4s, expire 6s",
+    "status": "Ciclo {{current}} de {{total}} - {{phase}}",
+    "completed": "Concluído",
+    "nextHint": "Deslize ou toque na tela para continuar",
+    "waiting": "Aguarde enquanto orientamos sua respiração ({{cycles}} ciclos)",
+    "ballA11y": "Bola de respiração, estado: {{phase}}",
+    "phase": {
+      "inspire": "Inspirar",
+      "expire": "Expirar",
+      "hold": "Segurar"
+    }
   },
   "grounding": {
     "title": "Técnica 5-4-3-2-1",
@@ -26,6 +36,7 @@
     "save": "Salvar",
     "delete": "Excluir",
     "listen": "Ouvir cartão",
+    "sessionNavigationHint": "Deslize ou toque na tela para navegar",
     "stop": "Parar",
     "imageAdd": "Adicionar imagem",
     "imageRemove": "Remover imagem"

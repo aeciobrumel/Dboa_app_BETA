@@ -41,11 +41,13 @@ i18n.changeLanguage = async (lng?: string) => {
 };
 
 // Hidrata linguagem salva ao iniciar
-(async () => {
+export const i18nReady = (async () => {
   try {
     const saved = await AsyncStorage.getItem('language');
     if (saved) await i18n.changeLanguage(saved);
-  } catch {}
+  } catch (e) {
+    console.warn('[i18n] Falha ao restaurar idioma:', e);
+  }
 })();
 
 export default i18n;

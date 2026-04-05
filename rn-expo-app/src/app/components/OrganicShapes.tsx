@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, StyleSheet, LayoutChangeEvent } from 'react-native';
 import { tokens } from '@app/theme/tokens';
+import { rng, withOpacity } from '@app/utils/decorative';
 
 type Props = {
   seed?: string | number;
@@ -9,21 +10,6 @@ type Props = {
   style?: any;
 };
 
-// Simple seeded RNG (LCG)
-const rng = (seedNum: number) => {
-  let s = seedNum % 2147483647;
-  if (s <= 0) s += 2147483646;
-  return () => (s = (s * 16807) % 2147483647) / 2147483647;
-};
-
-function hexToRgba(hex: string, alpha = 1) {
-  const h = hex.replace('#', '');
-  const bigint = parseInt(h, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
 
 export default function OrganicShapes({ seed = 1, count = 3, opacity = 0.12, style }: Props) {
   const [dims, setDims] = useState({ w: 0, h: 0 });
@@ -39,7 +25,7 @@ export default function OrganicShapes({ seed = 1, count = 3, opacity = 0.12, sty
     return new Array(count).fill(0).map((_, i) => {
       const color = palette[i % palette.length];
       return {
-        color: hexToRgba(color, opacity * (0.9 + rand() * 0.4)),
+        color: withOpacity(color, opacity * (0.9 + rand() * 0.4)),
         // Sizes are 40%..85% of the smallest dimension
         size: 0.4 + rand() * 0.45,
         x: rand(),

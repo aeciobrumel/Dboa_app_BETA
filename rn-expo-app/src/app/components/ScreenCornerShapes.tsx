@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { tokens } from '@app/theme/tokens';
+import { rng, withOpacity } from '@app/utils/decorative';
 
 type Props = {
   opacity?: number; // opacidade base das formas
@@ -20,21 +21,6 @@ type Shape = {
   kind: 'circle' | 'pill' | 'half';
 };
 
-// LCG simples para aleatoriedade determinística
-function rng(seedNum: number) {
-  let s = seedNum % 2147483647;
-  if (s <= 0) s += 2147483646;
-  return () => (s = (s * 16807) % 2147483647) / 2147483647;
-}
-
-function withOpacity(hex: string, alpha: number) {
-  const h = hex.replace('#', '');
-  const bigint = parseInt(h, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
 
 export default function ScreenCornerShapes({ opacity = 0.10, safeTop = 72, safeBottom = 96, safeSides = 12, seed }: Props) {
   const palette = [tokens.colors.primary, tokens.colors.secondary, tokens.colors.tertiary, tokens.colors.accent];
