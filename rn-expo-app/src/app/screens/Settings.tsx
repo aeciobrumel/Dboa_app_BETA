@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Animated,
   Platform,
@@ -20,6 +21,7 @@ import { useContactsStore, type EmergencyContactApp } from '@app/state/useContac
 import type { RootStackParamList } from '@app/navigation/RootNavigator';
 import { useSettingsStore } from '@app/state/useSettingsStore';
 import { tokens } from '@app/theme/tokens';
+import { tap } from '@app/utils/haptics';
 import { preferredVoiceAvailable, speak } from '@app/utils/speak';
 
 type FormValues = {
@@ -84,6 +86,7 @@ const fromPercent = (percent: number, min: number, max: number) =>
   min + (clamp(percent, 0, 100) / 100) * (max - min);
 
 type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'link';
+const ACTION_BUTTON_LOCK_MS = 500;
 
 function ShieldCheckIcon() {
   return (
@@ -98,6 +101,27 @@ function ShieldCheckIcon() {
         d="M9.4 12.2L11.2 14L14.8 10.4"
         stroke={tokens.colors.primary}
         strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+function PlusIcon({ color }: { color: string }) {
+  return (
+    <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" accessibilityElementsHidden>
+      <Path
+        d="M12 5V19"
+        stroke={color}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M5 12H19"
+        stroke={color}
+        strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
@@ -141,16 +165,68 @@ function ActionButton({
   variant = 'secondary',
   accessibilityLabel,
   small = false,
+  disabled = false,
+  leftIcon,
+  prominent = false,
 }: {
   label: string;
-  onPress: () => void;
+  onPress: () => void | Promise<void>;
   variant?: ButtonVariant;
   accessibilityLabel?: string;
   small?: boolean;
+  disabled?: boolean;
+  leftIcon?: React.ReactNode;
+  prominent?: boolean;
 }) {
+  const { hapticsEnabled } = useSettingsStore();
+  const [isPending, setIsPending] = React.useState(false);
+  const pressLockRef = React.useRef(false);
+  const isMountedRef = React.useRef(true);
+
+  React.useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const handlePress = React.useCallback(async () => {
+    if (disabled || pressLockRef.current) {
+      return;
+    }
+
+    pressLockRef.current = true;
+    if (isMountedRef.current) {
+      setIsPending(true);
+    }
+
+    const startedAt = Date.now();
+
+    try {
+      if (hapticsEnabled) {
+        await tap();
+      }
+      await onPress();
+    } finally {
+      const elapsed = Date.now() - startedAt;
+      const remaining = ACTION_BUTTON_LOCK_MS - elapsed;
+
+      if (remaining > 0) {
+        await new Promise(resolve => setTimeout(resolve, remaining));
+      }
+
+      pressLockRef.current = false;
+      if (isMountedRef.current) {
+        setIsPending(false);
+      }
+    }
+  }, [disabled, hapticsEnabled, onPress]);
+
+  const isDisabled = disabled || isPending;
   const baseClass = small
     ? 'min-h-10 self-start rounded-xl px-3 py-2'
-    : 'min-h-12 rounded-xl px-4 py-3';
+    : prominent
+      ? 'min-h-[56px] rounded-2xl px-5 py-4'
+      : 'min-h-12 rounded-xl px-4 py-3';
 
   const variantClass =
     variant === 'primary'
@@ -170,11 +246,29 @@ function ActionButton({
           ? ''
           : 'underline';
 
+  const textColor =
+    variant === 'primary'
+      ? '#FFFFFF'
+      : variant === 'destructive'
+        ? dangerColor
+        : variant === 'secondary'
+          ? tokens.colors.text
+          : tokens.colors.primary;
+
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
-      onPress={onPress}
+      accessibilityState={{ disabled: isDisabled, busy: isPending }}
+      disabled={isDisabled}
+      onPress={() => {
+        void handlePress();
+      }}
+      android_ripple={
+        variant === 'link'
+          ? undefined
+          : { color: hexToRgba(tokens.colors.primary, variant === 'primary' ? 0.18 : 0.12) }
+      }
       className={cn(
         variant !== 'link' && 'items-center justify-center',
         variant === 'link' ? 'self-start px-0 py-0' : baseClass,
@@ -195,24 +289,37 @@ function ActionButton({
                   borderWidth: 1,
                 }
               : undefined,
-        pressed ? { opacity: 0.8 } : undefined,
+        variant !== 'link'
+          ? {
+              shadowColor,
+              shadowOpacity: prominent ? (pressed || isPending ? 0.12 : 0.24) : pressed || isPending ? 0.08 : 0.16,
+              shadowRadius: prominent ? (pressed || isPending ? 5 : 12) : pressed || isPending ? 3 : 8,
+              shadowOffset: {
+                width: 0,
+                height: prominent ? (pressed || isPending ? 3 : 7) : pressed || isPending ? 2 : 5,
+              },
+              elevation: prominent ? (pressed || isPending ? 2 : 6) : pressed || isPending ? 1 : 4,
+            }
+          : undefined,
+        pressed || isPending
+          ? {
+              opacity: 0.92,
+              transform: [{ scale: prominent ? 0.98 : 0.985 }, { translateY: 1 }],
+            }
+          : undefined,
+        isDisabled && !isPending ? { opacity: 0.55 } : undefined,
       ]}
     >
-      <Text
-        className={cn('text-[15px] font-semibold', small && 'text-sm', textClass)}
-        style={[
-          fontBody,
-          variant === 'primary'
-            ? { color: '#FFFFFF' }
-            : variant === 'destructive'
-              ? { color: dangerColor }
-              : variant === 'secondary'
-                ? { color: tokens.colors.text }
-                : { color: tokens.colors.primary },
-        ]}
-      >
-        {label}
-      </Text>
+      <View className="flex-row items-center justify-center gap-2">
+        {isPending ? <ActivityIndicator size="small" color={textColor} /> : null}
+        {!isPending && leftIcon ? leftIcon : null}
+        <Text
+          className={cn('text-[15px] font-semibold', small && 'text-sm', textClass)}
+          style={[fontBody, { color: textColor }]}
+        >
+          {label}
+        </Text>
+      </View>
     </Pressable>
   );
 }
@@ -598,6 +705,14 @@ export default function Settings() {
     [editingContactId, removeContact, resetContactForm, t],
   );
 
+  const isEditingContact = Boolean(editingContactId);
+  const contactActionLabel = isEditingContact
+    ? t('settings:trustedContactUpdate', 'Salvar alterações')
+    : t('settings:trustedContactAdd', 'Adicionar contato');
+  const contactActionHelper = isEditingContact
+    ? 'Revise os dados e toque abaixo para atualizar este contato.'
+    : 'Depois de preencher nome e telefone, toque abaixo para adicionar este contato.';
+
   return (
     <View className="flex-1" style={{ backgroundColor: tokens.colors.bg }}>
       <View
@@ -614,6 +729,7 @@ export default function Settings() {
       <ScrollView
         className="flex-1"
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
         accessibilityLabel={t('settings:title')}
       >
         <View className="w-full max-w-[390px] self-center gap-5 px-4 pb-10 pt-6">
@@ -990,17 +1106,34 @@ export default function Settings() {
               </View>
             </View>
 
-            <View className="gap-2.5">
+            <View
+              className="gap-3 rounded-2xl border px-3.5 py-3.5"
+              style={{
+                backgroundColor: hexToRgba(tokens.colors.primary, 0.08),
+                borderColor: hexToRgba(tokens.colors.primary, 0.18),
+              }}
+            >
+              <Text
+                className="text-xs font-semibold uppercase"
+                style={[trackingWide, { color: tokens.colors.primary }]}
+              >
+                {isEditingContact ? 'Atualizar contato' : 'Adicionar contato'}
+              </Text>
+              <Text
+                className="text-[13px] leading-[18px]"
+                style={[fontBody, { color: tokens.colors.textMuted }]}
+              >
+                {contactActionHelper}
+              </Text>
+
               <ActionButton
                 variant="primary"
-                label={
-                  editingContactId
-                    ? t('settings:trustedContactUpdate', 'Salvar alterações')
-                    : t('settings:trustedContactAdd', 'Adicionar contato')
-                }
+                prominent
+                label={contactActionLabel}
+                leftIcon={isEditingContact ? undefined : <PlusIcon color="#FFFFFF" />}
                 onPress={handleSaveContact}
               />
-              {editingContactId ? (
+              {isEditingContact ? (
                 <ActionButton
                   variant="secondary"
                   label={t('settings:trustedContactCancelEdit', 'Cancelar edição')}
