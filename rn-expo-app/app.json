@@ -1,12 +1,15 @@
 {
   "expo": {
     "name": "CopingCards",
-    "slug": "coping-cards",
+    "slug": "dboa",
     "scheme": "copingcards",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "splash": { "backgroundColor": "#FFFFFF", "resizeMode": "contain" },
+    "splash": {
+      "backgroundColor": "#FFFFFF",
+      "resizeMode": "contain"
+    },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -17,23 +20,29 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.example.copingcards",
       "buildNumber": "1.0.0",
-      "usesNonExemptEncryption": false,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "Precisamos acessar suas imagens para você adicionar fotos aos cartões.",
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "android": {
-      "package": "com.example.copingcards",
-      "versionCode": 1,
-      "permissions": ["READ_MEDIA_IMAGES", "READ_MEDIA_AUDIO"]
+      "package": "com.abmsilva.dboa",
+      "permissions": [
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro"
     },
     "extra": {
       "eas": {
-        "projectId": "00000000-0000-0000-0000-000000000000"
+        "projectId": "7ebe4e8f-f529-4a95-953e-99688b120c1b"
       },
       "legal": {
         "privacyUrl": "https://example.com/privacy",
