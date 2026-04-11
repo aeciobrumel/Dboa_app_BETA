@@ -3,7 +3,7 @@ import '../global.css';
 import 'react-native-gesture-handler';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import React, { useEffect, useMemo, useState } from 'react';
-import { LogBox, Text, TextInput } from 'react-native';
+import { ActivityIndicator, LogBox, StyleSheet, Text, TextInput, View } from 'react-native';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { enableScreens } from 'react-native-screens';
 import { Platform } from 'react-native';
@@ -19,6 +19,7 @@ import GlobalBackgroundAudio from '@app/components/GlobalBackgroundAudio';
 import ErrorBoundary from '@app/components/ErrorBoundary';
 import { useCardsStore } from '@app/state/useCardsStore';
 import { useSettingsStore } from '@app/state/useSettingsStore';
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 
 if (Platform.OS !== 'web') {
   // Evita problemas de exibição no Web com react-native-screens
@@ -38,7 +39,7 @@ export default function App() {
   const theme = useMemo(() => DefaultTheme, []);
 
   const [isReady, setIsReady] = useState(false);
-  const [fontsLoaded] = useFonts(customFonts);
+  const [fontsLoaded, fontError] = useFonts(customFonts);
 
   useEffect(() => {
     let active = true;
@@ -71,6 +72,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (fontError) {
+      console.warn('[App] Falha ao carregar fontes personalizadas:', fontError);
+    }
+  }, [fontError]);
+
+  useEffect(() => {
     if (!fontsLoaded) return;
     // Define fonte padrão globalmente quando carregada
     tokens.typography.fontFamily = 'Lemondrop';
@@ -83,16 +90,35 @@ export default function App() {
     textInputWithDefaults.defaultProps.style = [{ fontFamily: 'Lemondrop' }, textInputWithDefaults.defaultProps.style].filter(Boolean);
   }, [fontsLoaded]);
 
-  if (!isReady || !fontsLoaded) return null;
+  const readyToRender = isReady && (fontsLoaded || !!fontError);
+
+  if (!readyToRender) {
+    return (
+      <View style={styles.loadingScreen}>
+        <ActivityIndicator size="small" color={tokens.colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <ErrorBoundary>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <NavigationContainer theme={{ ...theme, colors: { ...theme.colors, primary: tokens.colors.primary, background: tokens.colors.bg } }}>
-          <GlobalBackgroundAudio />
-          <RootNavigator />
-        </NavigationContainer>
-      </GestureHandlerRootView>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <NavigationContainer theme={{ ...theme, colors: { ...theme.colors, primary: tokens.colors.primary, background: tokens.colors.bg } }}>
+            <GlobalBackgroundAudio />
+            <RootNavigator />
+          </NavigationContainer>
+        </GestureHandlerRootView>
+      </SafeAreaProvider>
     </ErrorBoundary>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingScreen: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: tokens.colors.bg,
+  },
+});
